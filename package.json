@@ -1,0 +1,24 @@
+{
+  "name": "gestor-financeiro",
+  "version": "1.0.0",
+  "description": "# Personal Finance App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nogeniuss/Gestor-Financeiro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nogeniuss/Gestor-Financeiro/issues"
+  },
+  "homepage": "https://github.com/nogeniuss/Gestor-Financeiro#readme",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}

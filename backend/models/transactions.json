@@ -1,0 +1,21 @@
+{
+    "transacoes": [
+      {
+        "id": 1,
+        "data": "2025-03-19",
+        "descricao": "Supermercado XYZ",
+        "valor": -150.00,
+        "tipo": "DEBITO",
+        "categoria": "Alimentação"
+      },
+      {
+        "id": 2,
+        "data": "2025-03-18",
+        "descricao": "Salário - Empresa ABC",
+        "valor": 5000.00,
+        "tipo": "CREDITO",
+        "categoria": "Salário"
+      }
+    ]
+  }
+  
