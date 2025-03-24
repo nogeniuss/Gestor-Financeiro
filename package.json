@@ -1,10 +1,11 @@
 {
   "name": "gestor-financeiro",
   "version": "1.0.0",
-  "description": "# Personal Finance App",
-  "main": "server.js",
+  "description": "",
+  "main": "convert.js",
   "scripts": {
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc src/controllers/**/*.js src/services/**/*.js --destination docs"
   },
   "repository": {
     "type": "git",
@@ -17,8 +18,14 @@
     "url": "https://github.com/nogeniuss/Gestor-Financeiro/issues"
   },
   "homepage": "https://github.com/nogeniuss/Gestor-Financeiro#readme",
-  "type": "module",
   "dependencies": {
-    "dotenv": "^16.4.7"
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "multer": "^1.4.5-lts.2"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.4"
   }
 }
