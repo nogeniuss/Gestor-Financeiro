@@ -1,10 +1,3 @@
-/**
- * Módulo responsável pela conversão de arquivos CSV para JSON,
- * monitorando a pasta de entrada para novos arquivos e salvando
- * os arquivos convertidos em uma pasta de saída.
- * 
- * @module convertService
- */
 
 const fs = require('fs');
 const path = require('path');
@@ -20,17 +13,6 @@ if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true });
 }
 
-/**
- * Converte um arquivo CSV para JSON com a estrutura desejada.
- * 
- * A função lê o arquivo CSV, localiza a linha de cabeçalho correto, converte
- * as transações para um formato JSON e salva o resultado na pasta de saída.
- *
- * @function
- * @param {string} filePath - Caminho completo do arquivo CSV a ser convertido.
- * @throws {Error} Lança um erro se o cabeçalho das transações não for encontrado ou em caso de erro durante a conversão.
- * @returns {void} Não retorna nada. Salva o arquivo JSON convertido na pasta de saída.
- */
 function convertCsvToJson(filePath) {
   console.log(`Convertendo ${filePath} para JSON...`);
   try {
@@ -79,15 +61,6 @@ function convertCsvToJson(filePath) {
   }
 }
 
-/**
- * Processa todos os arquivos CSV existentes na pasta de entrada e os converte para JSON.
- * 
- * A função lê o diretório de entrada e chama a função de conversão para cada arquivo CSV encontrado.
- *
- * @function
- * @param {string} inputDir - O diretório onde os arquivos CSV estão armazenados.
- * @returns {void} Não retorna nada. Processa os arquivos CSV na pasta de entrada.
- */
 fs.readdir(inputDir, (err, files) => {
   if (err) {
     console.error('❌ Erro ao ler o diretório:', err);
@@ -101,16 +74,6 @@ fs.readdir(inputDir, (err, files) => {
   });
 });
 
-/**
- * Monitoramento de novos arquivos CSV na pasta de entrada.
- * 
- * A função usa o chokidar para observar a pasta de entrada em tempo real. Quando um novo
- * arquivo CSV é adicionado, ele é automaticamente processado e convertido para JSON.
- *
- * @function
- * @param {string} inputDir - O diretório onde os arquivos CSV serão monitorados.
- * @returns {void} Não retorna nada. Apenas monitora a pasta para novos arquivos CSV.
- */
 const watcher = chokidar.watch(inputDir, {
   ignored: /(^|[\/\\])\../,
   persistent: true

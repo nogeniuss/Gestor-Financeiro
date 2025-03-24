@@ -5,12 +5,7 @@ const listaExpressoes = require('./lista_expressoes_regulares');  // Importa as 
 // Diretório onde os arquivos JSON estão armazenados (na raiz do projeto)
 const jsonDir = path.join(__dirname, '..', '..', 'dao', 'extrato_inter_json');
 console.log("financialservice carregado")
-/**
- * Função que retorna o saldo atual a partir dos arquivos JSON.
- * 
- * @function saldoAtual
- * @returns {number} O saldo atual calculado.
- */
+
 function saldoAtual() {
     console.log('Calculando saldo atual...');
     let saldo = 0;
@@ -23,8 +18,7 @@ function saldoAtual() {
             if (filePath.endsWith('.json')) {
                 const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
                 
-                // Garantir que o saldo_transacao seja tratado como número de ponto flutuante
-                saldo += parseFloat(data.saldo_transacao) || 0; // Adiciona o saldo do arquivo
+                saldo += data.saldo_transacao || 0; // Adiciona o saldo do arquivo
             }
         });
     } catch (err) {
@@ -35,12 +29,6 @@ function saldoAtual() {
     return saldo; // O saldo agora é retornado diretamente com precisão decimal
 }
 
-/**
- * Função que retorna o valor total gasto por data (agrupar saídas por data)
- * 
- * @function valorGastoPorData
- * @returns {Object} Um objeto contendo o total gasto por data.
- */
 function valorGastoPorData() {
     console.log('Calculando valor gasto por data...');
     const files = fs.readdirSync(jsonDir);
@@ -60,12 +48,6 @@ function valorGastoPorData() {
     return result;
 }
 
-/**
- * Função que retorna o saldo total por dia (soma os saldos transacionais por dia)
- * 
- * @function saldoTotalPorDia
- * @returns {Object} Um objeto contendo o saldo total por dia.
- */
 function saldoTotalPorDia() {
     console.log('Calculando saldo total por dia...');
     const files = fs.readdirSync(jsonDir);
@@ -91,12 +73,6 @@ function saldoTotalPorDia() {
     return result;
 }
 
-/**
- * Função que retorna o valor total por categoria
- * 
- * @function valorPorCategoria
- * @returns {Object} Um objeto contendo o total de valor por categoria.
- */
 function valorPorCategoria() {
     console.log('Calculando valor por categoria...');
     const files = fs.readdirSync(jsonDir);
@@ -140,14 +116,6 @@ function valorPorCategoria() {
     return result;
 }
 
-/**
- * Função auxiliar para verificar se uma descrição corresponde a alguma expressão regular
- * 
- * @function verificarCategoria
- * @param {Array} expressoes - Lista de expressões regulares
- * @param {string} descricao - Descrição da transação
- * @returns {boolean} True se corresponder a alguma expressão, false caso contrário
- */
 function verificarCategoria(expressoes, descricao) {
     console.log('Verificando categoria para: ' + descricao);
     if (!expressoes || !descricao) return false;
@@ -173,56 +141,45 @@ function verificarCategoria(expressoes, descricao) {
     return false; // Nenhuma correspondência foi encontrada
 }
 
-/**
- * Função auxiliar para converter string de data para objeto Date
- * 
- * @function convertStringToDate
- * @param {string} dateString - String de data no formato 'dd/mm/yyyy'
- * @returns {Date} Objeto Date correspondente
- */
 function convertStringToDate(dateString) {
-    console.log('Convertendo string de data para objeto Date: ' + dateString);
-    if (!dateString) return new Date(0); // Data mínima se não for fornecida
+    if (!dateString) return null;
     
+    // Verifica o formato da data (dd/mm/yyyy)
     const parts = dateString.split('/');
-    if (parts.length !== 3) return new Date(0);
+    if (parts.length === 3) {
+        // Formato dd/mm/yyyy
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Meses em JS são 0-11
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+    }
     
-    // Cria um objeto Date (mês é 0-indexed em JavaScript)
-    return new Date(parts[2], parts[1] - 1, parts[0]);
+    // Se não for no formato esperado, tenta converter diretamente
+    return new Date(dateString);
 }
 
-/**
- * Função que filtra as transações por categoria e intervalo de datas
- * 
- * @function filtroCategoriaData
- * @param {string} categoria - Categoria a ser filtrada (ex: 'Pix', 'Compra', etc.)
- * @param {string} dataInicio - Data inicial no formato 'dd/mm/yyyy'
- * @param {string} dataFim - Data final no formato 'dd/mm/yyyy'
- * @returns {Array} Um array com as transações filtradas.
- */
 function filtroCategoriaData(categoria, dataInicio, dataFim) {
     console.log('Filtrando transações por categoria e intervalo de datas...');
-    const files = fs.readdirSync(jsonDir); // Lê os arquivos do diretório
+    console.log('Parâmetros recebidos:', { categoria, dataInicio, dataFim });
+    
+    const files = fs.readdirSync(jsonDir);
+    console.log(`Encontrados ${files.length} arquivos para processar`);
+    
     let result = [];
-
+    
     try {
         // Itera sobre cada arquivo JSON
         files.forEach(file => {
-         app.get('/api/transacoes-recentes', isAuthenticated, (req, res) => {
-    const financialService = require('./src/services/financialService');
-    const limite = parseInt(req.query.limite) || 10;
-    const transacoes = financialService.obterTransacoesRecentes(limite);
-    
-    res.json({
-        success: true,
-        transacoes: transacoes
-    });
-});   if (file.endsWith('.json')) {
+            if (file.endsWith('.json')) {
                 const filePath = path.join(jsonDir, file);
-                const data = JSON.parse(fs.readFileSync(filePath, 'utf8')); // Lê e faz o parse do arquivo JSON
-
+                console.log(`Processando arquivo: ${filePath}`);
+                
+                const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                
                 // Verifica cada entrada do extrato
                 if (data.extrato && data.extrato.length > 0) {
+                    console.log(`Arquivo contém ${data.extrato.length} transações`);
+                    
                     data.extrato.forEach(entry => {
                         let incluirTransacao = true;
                         
@@ -232,8 +189,11 @@ function filtroCategoriaData(categoria, dataInicio, dataFim) {
                             const startDate = convertStringToDate(dataInicio);
                             const endDate = convertStringToDate(dataFim);
                             
+                            console.log(`Comparando datas: ${entry.data} (${entryDate}) com intervalo ${dataInicio} (${startDate}) - ${dataFim} (${endDate})`);
+                            
                             if (entryDate < startDate || entryDate > endDate) {
                                 incluirTransacao = false;
+                                console.log(`Transação de ${entry.data} fora do intervalo de datas`);
                             }
                         }
                         
@@ -265,33 +225,33 @@ function filtroCategoriaData(categoria, dataInicio, dataFim) {
                                 categoriaTransacao = 'Outras';
                             }
                             
+                            console.log(`Categoria da transação: "${categoriaTransacao}", Categoria filtro: "${categoria}"`);
+                            
                             if (categoriaTransacao !== categoria) {
                                 incluirTransacao = false;
+                                console.log(`Transação excluída por categoria diferente`);
                             }
                         }
                         
                         // Adiciona a transação ao resultado se passou pelos filtros
                         if (incluirTransacao) {
+                            console.log(`Transação incluída no resultado: ${entry.data} - ${entry.descricao}`);
                             result.push(entry);
                         }
                     });
                 }
             }
         });
+        
+        console.log(`Total de transações após filtro: ${result.length}`);
+        return result;
     } catch (error) {
         console.error('Erro ao processar o filtro de categoria e data:', error);
         throw new Error('Erro ao processar os filtros');
     }
-
-    return result;
 }
 
-/**
- * Função que retorna o período do extrato (data mais antiga e mais recente)
- * 
- * @function obterPeriodoExtrato
- * @returns {Object} Um objeto contendo a data inicial e final do período
- */
+
 function obterPeriodoExtrato() {
     console.log('Obtendo período do extrato...');
     const files = fs.readdirSync(jsonDir);
@@ -339,13 +299,6 @@ function obterPeriodoExtrato() {
     };
 }
 
-/**
- * Função que retorna as transações mais recentes
- * 
- * @function obterTransacoesRecentes
- * @param {number} limite - Número máximo de transações a retornar
- * @returns {Array} Um array com as transações mais recentes
- */
 function obterTransacoesRecentes(limite = 10) {
     console.log('Obtendo transações mais recentes...');
     const files = fs.readdirSync(jsonDir);
@@ -394,13 +347,7 @@ function obterTransacoesRecentes(limite = 10) {
     
     return transacoes;
 }
-/**
- * Calcula o resumo financeiro com base em um conjunto de transações
- * 
- * @function calcularResumoFinanceiro
- * @param {Array} transacoes - Lista de transações para calcular o resumo
- * @returns {Object} Resumo financeiro calculado
- */
+
 function calcularResumoFinanceiro(transacoes = null) {
     console.log('Calculando resumo financeiro...');
     // Inicializa o objeto de resumo
@@ -538,33 +485,22 @@ function calcularResumoFinanceiro(transacoes = null) {
     return resumo;
 }
 
-/**
- * Função que retorna as categorias disponíveis para filtro
- * 
- * @function obterCategorias
- * @returns {Array} Um array com as categorias disponíveis
- */
 function obterCategorias() {
     console.log("Entrando na função obterCategorias");
     return [
-        { id: 1, name: 'Alimentação' },
-        { id: 2, name: 'Transporte' },
-        { id: 3, name: 'Moradia' },
-        { id: 4, name: 'Saúde' },
-        { id: 5, name: 'Educação' },
-        { id: 6, name: 'Lazer' },
-        { id: 7, name: 'Outros' }
+        { id: 1, name: 'Uber' },
+        { id: 2, name: 'Alimentação' },
+        { id: 3, name: 'Apostas' },
+        { id: 4, name: 'Aluguel' },
+        { id: 5, name: 'Água' },
+        { id: 6, name: 'Luz' },
+        { id: 7, name: 'Dogs' },
+        { id: 8, name: 'Gás' },
+        { id: 9, name: 'Outras' },
+        { id: 10, name: 'Transferência (Pessoa)'}
     ];
 }
 
-
-
-/**
- * Função que retorna o resumo financeiro completo
- * 
- * @function obterResumoFinanceiro
- * @returns {Object} Um objeto com o resumo financeiro completo
- */
 function obterResumoFinanceiro() {
     console.log("Entrando na função obterResumoFinanceiro");
     try {

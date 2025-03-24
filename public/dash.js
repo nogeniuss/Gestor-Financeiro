@@ -1,8 +1,3 @@
-/**
- * Gestor Financeiro - Dashboard
- * Este arquivo contém funções específicas para o dashboard financeiro,
- * incluindo gráficos, tabelas e visualizações de dados.
- */
 console.log('Carregando o arquivo dashboard.js...');
 // Configurações globais para os gráficos
 Chart.defaults.font.family = "'Poppins', 'Helvetica', 'Arial', sans-serif";
@@ -43,25 +38,19 @@ const chartColors = {
     ]
 };
 
-/**
- * Inicializa o dashboard quando o DOM estiver carregado
- */
+
 console.log('Iniciando o dashboard...');
 document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('dashboard-container')) {
         initializeDashboard();
         
         // Adiciona evento ao botão de filtrar
-        document.getElementById('btn-filter')?.addEventListener('click', applyFilters);
+        document.getElementById('applyFilters')?.addEventListener('click', applyFilters);
         
         // Carrega as categorias disponíveis para o filtro
         loadCategories();
     }
 });
-
-/**
- * Inicializa o dashboard carregando os dados e configurando os gráficos
- */
 
 async function initializeDashboard() {
     console.log('Inicializando o dashboard...');
@@ -109,52 +98,62 @@ async function initializeDashboard() {
 }
 
 
-/**
- * Converte data do formato dd/mm/yyyy para yyyy-mm-dd (para inputs date)
- */
+
 function convertDateFormat(dateString) {
-    console.log('Convertendo data de dd/mm/yyyy para yyyy-mm-dd');
     const parts = dateString.split('/');
     return `${parts[2]}-${parts[1]}-${parts[0]}`;
 }
 
-/**
- * Carrega as categorias disponíveis para o filtro
- */
-async function loadCategories() {
-    console.log('Carregando categorias...');
-    try {
-        const response = await fetch('/api/categorias');
-        const data = await response.json();
-        
-        if (data.success) {
-            const categoriaSelect = document.getElementById('categoria');
-            if (categoriaSelect) {
-                // Limpa as opções existentes
-                categoriaSelect.innerHTML = '<option value="">Todas as categorias</option>';
-                
-                // Adiciona as categorias da lista de expressões
-                data.categorias.forEach(categoria => {
-                    const option = document.createElement('option');
-                    option.value = categoria;
-                    option.textContent = categoria;
-                    categoriaSelect.appendChild(option);
-                });
-            }
-        }
-    } catch (error) {
-        console.error('Erro ao carregar categorias:', error);
-    }
-}
 
-/**
- * Aplica os filtros selecionados
- */
-function applyFilters() {
+async function loadCategories() {
+    try {
+      console.log('Iniciando carregamento de categorias...');
+      const response = await fetch('/api/categorias');
+      
+      if (!response.ok) {
+        throw new Error(`Falha ao carregar categorias: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Dados recebidos:', data);
+      
+      const selectElement = document.getElementById('categoria-select');
+      
+      if (!selectElement) {
+        console.log('Elemento select para categorias não encontrado');
+        return;
+      }
+      
+      // Limpar opções existentes
+      selectElement.innerHTML = '<option value="">Todas as categorias</option>';
+      
+      // Adicionar novas opções
+      if (data.success && data.categorias) {
+        data.categorias.forEach(categoria => {
+          const option = document.createElement('option');
+          
+          // Usar a propriedade 'name' em vez de 'categoria'
+          option.value = categoria.name;
+          option.textContent = categoria.name;
+          
+          selectElement.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao carregar categorias:', error);
+    }
+  }
+  
+  
+
+
+  function applyFilters() {
     console.log('Aplicando filtros...');
     const dataInicio = document.getElementById('dataInicio').value;
     const dataFim = document.getElementById('dataFim').value;
-    const categoria = document.getElementById('categoria').value;
+    const categoria = document.getElementById('categoria-select').value; // Atualizado para usar o select correto
+    
+    console.log('Filtros selecionados:', { dataInicio, dataFim, categoria });
     
     // Valida as datas
     if (dataInicio && dataFim) {
@@ -182,9 +181,12 @@ function applyFilters() {
         dataInicio: dataInicio ? formatarDataAPI(dataInicio) : '',
         dataFim: dataFim ? formatarDataAPI(dataFim) : ''
     };
+
+    console.log('Parâmetros para a API:', params);
     
     // Faz a requisição para a API
     console.log('Enviando requisição para a API com os parâmetros:', params);
+    
     fetch('/api/filtrar-transacoes', {
         method: 'POST',
         headers: {
@@ -192,14 +194,23 @@ function applyFilters() {
         },
         body: JSON.stringify(params)
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Status da resposta:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Dados recebidos da API:', data);
+        
         if (data.success) {
             // Exibe as transações filtradas
             displayRecentTransactions(data.transacoes);
             
             // Atualiza os gráficos com os dados filtrados
-            updateChartsWithFilteredData(data.resumo);
+            if (data.resumo) {
+                updateChartsWithFilteredData(data.resumo);
+            } else {
+                console.warn('Dados de resumo não encontrados na resposta');
+            }
             
             showAlert('Filtros aplicados com sucesso', 'success');
         } else {
@@ -215,9 +226,9 @@ function applyFilters() {
     });
 }
 
-/**
- * Atualiza os gráficos com os dados filtrados
- */
+
+
+
 function updateChartsWithFilteredData(resumo) {
     console.log('Atualizando gráficos com dados filtrados...');
     // Atualiza os dados do dashboard
@@ -233,9 +244,6 @@ function updateChartsWithFilteredData(resumo) {
     createExpenseTrendChart();
 }
 
-/**
- * Atualiza os cards informativos com os dados financeiros
- */
 function updateFinancialCards() {
     console.log('Atualizando cards informativos...');
     // Card de Saldo Atual
@@ -291,11 +299,7 @@ function updateFinancialCards() {
     });
 }
 
-/**
- * Atualiza um card informativo
- * @param {string} id - ID do elemento do card
- * @param {Object} data - Dados para atualizar o card
- */
+
 function updateCard(id, data) {
     const card = document.getElementById(id);
     if (!card) return;
@@ -334,9 +338,6 @@ function initializeCharts() {
     createExpenseTrendChart();
 }
 
-/**
- * Cria o gráfico de gastos por data
- */
 function createExpensesByDateChart() {
     console.log('Criando gráfico de gastos por data...');
     const ctx = document.getElementById('chart-expenses-by-date')?.getContext('2d');
@@ -391,9 +392,6 @@ function createExpensesByDateChart() {
     });
 }
 
-/**
- * Cria o gráfico de saldo por dia
- */
 function createBalanceByDayChart() {
     console.log('Criando gráfico de saldo por dia...');
     const ctx = document.getElementById('chart-balance-by-day')?.getContext('2d');
@@ -449,9 +447,7 @@ function createBalanceByDayChart() {
     });
 }
 
-/**
- * Cria o gráfico de gastos por categoria
- */
+
 function createExpensesByCategoryChart() {
     console.log('Criando gráfico de gastos por categoria...'); 
     const ctx = document.getElementById('chart-expenses-by-category')?.getContext('2d');
@@ -501,9 +497,7 @@ function createExpensesByCategoryChart() {
     });
 }
 
-/**
- * Cria o gráfico de tendência de gastos (últimos 7 dias vs 7 dias anteriores)
- */
+
 function createExpenseTrendChart() {
     console.log('Criando gráfico de tendência de gastos...');
     const ctx = document.getElementById('chart-expense-trend')?.getContext('2d');
@@ -573,9 +567,6 @@ function createExpenseTrendChart() {
     });
 }
 
-/**
- * Carrega as transações recentes para exibir na tabela
- */
 async function loadRecentTransactions() {
     console.log('Carregando transações recentes...');
     try {
@@ -602,10 +593,7 @@ async function loadRecentTransactions() {
     }
 }
 
-/**
- * Exibe as transações recentes na tabela
- * @param {Array} transacoes - Lista de transações para exibir
- */
+
 function displayRecentTransactions(transacoes) {
     console.log('Exibindo transações recentes...');
     const tableBody = document.getElementById('recent-transactions-table-body');
@@ -651,12 +639,6 @@ function displayRecentTransactions(transacoes) {
     });
 }
 
-/**
- * Formata um valor monetário
- * @param {number} valor - Valor a ser formatado
- * @param {boolean} includeSymbol - Se deve incluir o símbolo da moeda
- * @returns {string} Valor formatado como moeda
- */
 function formatCurrency(valor, includeSymbol = true) {
    console.log('Formatando valor:', valor);
     const options = {
@@ -668,11 +650,6 @@ function formatCurrency(valor, includeSymbol = true) {
     return new Intl.NumberFormat('pt-BR', options).format(valor);
 }
 
-/**
- * Formata uma data no formato dd/mm/yyyy
- * @param {string} dataStr - String de data no formato original
- * @returns {string} Data formatada
- */
 function formatDate(dataStr) {
     console.log('Formatando data:', dataStr);
     if (!dataStr) return '';
@@ -689,11 +666,6 @@ function formatDate(dataStr) {
     }
 }
 
-/**
- * Formata uma data para o formato aceito pela API (yyyy-mm-dd)
- * @param {Date} data - Objeto Date
- * @returns {string} Data formatada para API
- */
 function formatDateForAPI(data) {
     console.log('Formatando data para API:', data);
     const ano = data.getFullYear();
@@ -702,10 +674,7 @@ function formatDateForAPI(data) {
     return `${ano}-${mes}-${dia}`;
 }
 
-/**
- * Exibe ou oculta o indicador de carregamento
- * @param {boolean} show - Se true, mostra o indicador; se false, oculta
- */
+
 function showLoading(show) {
     console.log('Exibindo/ocultando indicador de carregamento:', show);
     const loader = document.getElementById('dashboard-loader');
@@ -719,11 +688,7 @@ function showLoading(show) {
     }
 }
 
-/**
- * Exibe um alerta na interface
- * @param {string} message - Mensagem a ser exibida
- * @param {string} type - Tipo de alerta (success, danger, warning, info)
- */
+
 function showAlert(message, type = 'info') {
     console.log('Exibindo alerta:', message, 'do tipo', type);
     const alertContainer = document.getElementById('dashboard-alerts');
@@ -745,9 +710,6 @@ function showAlert(message, type = 'info') {
     }, 5000);
 }
 
-/**
- * Atualiza os dados do dashboard
- */
 async function refreshDashboard() {
     console.log('Atualizando dashboard...');
     showLoading(true);

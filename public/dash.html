@@ -104,9 +104,12 @@
                             <input type="date" id="dataFim" class="form-control">
                         </div>
                         <div class="col-md-4">
-                            <label for="categoria" class="form-label">Categoria:</label>
-                            <input type="text" id="categoria" class="form-control" placeholder="Filtrar por Categoria">
-                        </div>
+                            <label for="categoria-select" class="form-label">Categoria:</label>
+                            <select id="categoria-select" class="form-control">
+                              <option value="">Todas as categorias</option>
+                              <!-- Opções serão adicionadas via JavaScript -->
+                            </select>
+                          </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button id="applyFilters" class="btn btn-primary w-100">Aplicar Filtros</button>
                         </div>
