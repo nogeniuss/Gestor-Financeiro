@@ -736,8 +736,10 @@ async function refreshDashboard() {
 
 // Adiciona evento ao botão de atualizar, se existir
 document.getElementById('btn-refresh-dashboard')?.addEventListener('click', refreshDashboard);
+document.getElementById('page-upload')?.addEventListener('click', () => {
+    window.location.href = 'http://localhost:3000/upload';
+});// Exporta funções para uso global
 
-// Exporta funções para uso global
 window.dashboardFunctions = {
     refresh: refreshDashboard,
     showAlert: showAlert,
