@@ -1,0 +1,86 @@
+/* Estilos para a página de análise financeira com IA */
+
+/* Estilização dos cards */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+    border-radius: 0.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    font-weight: 600;
+}
+
+/* Estilização do conteúdo da análise */
+#analysis-content, #recommendations-content {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+
+#analysis-content h3, #recommendations-content h3 {
+    color: #0d6efd;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+
+#analysis-content h4, #recommendations-content h4 {
+    color: #198754;
+    margin-top: 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
+#analysis-content ul, #recommendations-content ul {
+    margin-bottom: 1.5rem;
+}
+
+#analysis-content li, #recommendations-content li {
+    margin-bottom: 0.5rem;
+}
+
+/* Estilização dos loaders */
+#loading-analysis, #loading-recommendations {
+    padding: 2rem 0;
+}
+
+/* Estilização do formulário */
+#recommendations-form {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-check {
+    margin-bottom: 0.5rem;
+}
+
+/* Estilização para alertas */
+.alert {
+    border-radius: 0.5rem;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .card-header h5 {
+        font-size: 1.1rem;
+    }
+    
+    #analysis-content h3, #recommendations-content h3 {
+        font-size: 1.3rem;
+    }
+    
+    #analysis-content h4, #recommendations-content h4 {
+        font-size: 1.1rem;
+    }
+}

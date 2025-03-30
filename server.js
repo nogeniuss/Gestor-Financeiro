@@ -5,28 +5,22 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const financialController = require('./src/controllers/financialController');
 const convertService = require('./src/services/convertService');
+const financialService = require('./src/services/financialService');
 const fs = require('fs');
+const { upload, checkAndConvert } = require('./src/services/convertService'); // Importando as funções de convertService
+
+
 
 // Inicializa o app Express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/**
- * Configuração do body-parser
- */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
 
-/**
- * Configuração de sessão
- * @param {Object} req - Objeto de requisição
- * @param {Object} res - Objeto de resposta
- * @param {Function} next - Função para chamar o próximo middleware
- * @returns {void}
- * @throws {Error} - Erro ao configurar sessão
- * @throws {Error} - Erro ao salvar sessão
- */
+
 app.use(session({
   secret: 'gestor-financeiro-secret-key',
   resave: false,
@@ -34,14 +28,6 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 horas
 }));
 
-/**
- * Middleware para verificar se o usuário está autenticado
- * @param {Object} req - Objeto de requisição
- * @param {Object} res - Objeto de resposta
- * @param {Function} next - Função para chamar o próximo middleware
- * @returns {void}
- * @throws {Error} - Erro ao verificar autenticação
- */
 const isAuthenticated = (req, res, next) => {
   if (req.session.isAuthenticated) {
     return next();
@@ -49,38 +35,42 @@ const isAuthenticated = (req, res, next) => {
   res.redirect('/login');
 };
 
-/**
- * Rota de login
- * @route GET /login
- * @returns {void}
- * @throws {Error} - Erro ao acessar a página de login
- */
 app.get('/', (req, res) => {
   res.redirect('/login');
 });
 
+//rotas front-end
+
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public/login', 'login.html'));
 });
 
-/**
- * @route GET /dashboard
- * @access Private
- * @returns {void}
- * @throws {Error} - Erro ao acessar o dashboard
- */
 app.get('/dashboard', isAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dash.html'));
+  res.sendFile(path.join(__dirname, 'public/dash' ,'dash.html'));
 });
 
-/**
- * @route POST /login
- * @access Public
- * @param {string} username - Nome de usuário
- * @param {string} password - Senha
- * @returns {Object} - Objeto com sucesso ou erro
- * @throws {Error} - Erro ao fazer login
- */
+app.get('/upload', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/upload', 'upload.html'));
+});
+
+app.get('/metas', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/metas', 'metas.html'));
+});
+
+app.get('/analise-ia', isAuthenticated ,(req, res) => {
+res.sendFile(path.join(__dirname, 'public/ia', 'ai-analysis.html'));
+});
+
+app.get('/configuracoes', isAuthenticated, (req, res) => {
+res.sendFile(path.join(__dirname, 'public/config', 'config.html'));
+});
+
+app.get('/transacoes', isAuthenticated, (req, res) => {
+res.sendFile(path.join(__dirname, 'public/transacoes', 'transacoes.html'));
+});
+
+//rotas backend
+
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   console.log('Tentativa de login:', { username, password });
@@ -99,40 +89,84 @@ app.post('/login', (req, res) => {
   res.json({ success: false, message: 'Credenciais inválidas' });
 });
 
-/**
- * Rota de logout
- * @route GET /logout
- * @returns {void}
- * @throws {Error} - Erro ao fazer logout
- */
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/login');
 });
 
-app.get('/api/saldo', isAuthenticated, financialController.getSaldo);
-app.get('/api/gastos-por-data', isAuthenticated, financialController.getValorGastoPorData);
-app.get('/api/saldo-por-dia', isAuthenticated, financialController.getSaldoPorDia);
-app.get('/api/valor-por-categoria', isAuthenticated, financialController.getValorPorCategoria);
-
-/**
- * Rota para obter o resumo financeiro
- * @name GET /api/resumo-financeiro
- * @param {string} req.query.dataInicio - Data de início do período (opcional)
- * @param {string} req.query.dataFim - Data de fim do período (opcional)
- * @returns {Object} - Objeto com o resumo financeiro
- * @throws {Error} - Erro ao obter resumo financeiro
- */
-app.get('/api/resumo-financeiro', isAuthenticated, (req, res) => {
-  const financialService = require('./src/services/financialService');
-  const resultado = financialService.obterResumoFinanceiro();
-  res.json(resultado);
+app.get('/api/saldo', async (req, res) => {
+  try {
+    const { dataInicio, dataFim } = req.query;
+    
+    // Converte as strings de data para objetos Date, se fornecidas
+    let dataInicioObj = dataInicio ? new Date(dataInicio) : null;
+    let dataFimObj = dataFim ? new Date(dataFim) : null;
+    
+    // Se dataFim for fornecida, ajusta para o final do dia
+    if (dataFimObj) {
+      dataFimObj.setHours(23, 59, 59, 999);
+    }
+    
+    // Se não foram fornecidas datas, determina o intervalo completo
+    if (!dataInicioObj || !dataFimObj) {
+      const todasTransacoes = financialService.obterTodasTransacoes();
+      
+      if (todasTransacoes.length > 0) {
+        // Ordena transações por data
+        todasTransacoes.sort((a, b) => {
+          const dataA = new Date(a.data.split('/').reverse().join('-'));
+          const dataB = new Date(b.data.split('/').reverse().join('-'));
+          return dataA - dataB;
+        });
+        
+        // Se dataInicio não foi fornecida, use a data da transação mais antiga
+        if (!dataInicioObj) {
+          const dataTransacaoMaisAntiga = todasTransacoes[0].data.split('/');
+          dataInicioObj = new Date(`${dataTransacaoMaisAntiga[2]}-${dataTransacaoMaisAntiga[1]}-${dataTransacaoMaisAntiga[0]}`);
+          dataInicioObj.setHours(0, 0, 0, 0); // Início do dia
+        }
+        
+        // Se dataFim não foi fornecida, use a data da transação mais recente
+        if (!dataFimObj) {
+          const dataTransacaoMaisRecente = todasTransacoes[todasTransacoes.length - 1].data.split('/');
+          dataFimObj = new Date(`${dataTransacaoMaisRecente[2]}-${dataTransacaoMaisRecente[1]}-${dataTransacaoMaisRecente[0]}`);
+          dataFimObj.setHours(23, 59, 59, 999); // Final do dia
+        }
+      }
+    }
+    
+    // Calcula o saldo para o período determinado
+    const saldo = financialService.saldoAtual(dataInicioObj, dataFimObj);
+    
+    res.status(200).json({
+      success: true,
+      saldo: saldo,
+      saldoFormatado: saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+      periodo: {
+        inicio: dataInicioObj ? dataInicioObj.toISOString().split('T')[0] : null,
+        fim: dataFimObj ? dataFimObj.toISOString().split('T')[0] : null
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao obter saldo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao obter saldo',
+      error: error.message
+    });
+  }
 });
+app.get('/api/gastos-por-data', isAuthenticated, financialController.getValorGastoPorData);
 
-// Rota para obter as categorias disponíveis
+app.get('/api/saldo-por-dia', isAuthenticated, financialController.getSaldoPorDia);
+
+app.get('/api/valores-por-categoria', isAuthenticated, financialController.getValorPorCategoria);
+
+app.get('/api/resumo-financeiro', isAuthenticated, financialController.getResumoFinanceiro);
+
+// Rota para obter as categorias
 app.get('/api/categorias', isAuthenticated, financialController.getCategorias);
 
-// Rota para filtrar transações
 app.post('/api/filtrar-transacoes', isAuthenticated, (req, res) => {
   try {
     const { categoria, dataInicio, dataFim } = req.body;
@@ -155,74 +189,82 @@ app.post('/api/filtrar-transacoes', isAuthenticated, (req, res) => {
     });
   }
 });
+app.get('/api/transacoes-recentes', isAuthenticated, financialController.getTransacoesRecentes);
 
-// Rota para transações recentes
-app.get('/api/transacoes-recentes', (req, res) => {
-  try {
-    console.log('Rota /api/transacoes-recentes acessada');
-    // Obter o limite da query string ou usar um valor padrão
-    const limite = parseInt(req.query.limite) || 10;
-    // Importar o serviço financeiro
-    const financialService = require('./src/services/financialService');
-    // Obter as transações mais recentes usando sua função existente
-    const transacoes = financialService.getTransacoesRecentes(limite);
-    // Retornar as transações
-    res.json({
-      success: true,
-      transacoes: transacoes
-    });
-  } catch (error) {
-    console.error('Erro ao obter transações recentes:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erro ao obter transações recentes',
-      error: error.message
-    });
-  }
-});
+app.get('/api/periodo-extrato', isAuthenticated, financialController.getPeriodoExtrato);
 
-app.get('/upload', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'upload.html'));
-});
-
-// Rota para upload e conversão de CSV para JSON
-app.post('/api/upload-csv', convertService.upload.single('file'), (req, res) => {
+app.post('/api/upload-csv', upload.single('file'), async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    return res.status(400).json({ success: false, message: 'Nenhum arquivo enviado.' });
   }
-  
+
+  console.log(`📄 Arquivo recebido: ${req.file.path}`);
+
   try {
-    const filePath = req.file.path;
-    
-    // Tentar converter o arquivo usando a função do convertService
-    const jsonPath = convertService.convertCsvToJson(filePath);
-    
-    if (jsonPath) {
-      res.json({ 
+    // Chama a função de conversão para processar o arquivo CSV
+    const jsonFilePath = await convertService.convertCsvToJson(req.file.path);
+
+    if (jsonFilePath) {
+      // Verifica e converte os arquivos CSV restantes na pasta (se necessário)
+      await checkAndConvert();
+
+      res.status(200).json({
         success: true,
-        message: 'Arquivo convertido com sucesso', 
-        jsonPath,
-        fileName: path.basename(jsonPath)
+        message: 'Arquivo convertido com sucesso!',
+        jsonFilePath: jsonFilePath,
+        fileName: path.basename(jsonFilePath)
       });
     } else {
-      res.status(500).json({ 
-        success: false,
-        error: 'Erro ao converter o arquivo.' 
-      });
+      res.status(500).json({ success: false, message: 'Erro ao converter o arquivo.' });
     }
   } catch (error) {
-    console.error('Erro no processamento do upload:', error);
-    res.status(500).json({ 
-      success: false,
-      error: `Erro no servidor: ${error.message}` 
-    });
+    console.error('Erro ao processar o arquivo:', error.message);
+    res.status(500).json({ success: false, message: 'Erro ao processar o arquivo.' });
   }
 });
 
-/**
- * utilizamos o middleware para tratar erros
- * e retornar uma resposta JSON com o status 500 e uma mensagem de erro.
- */
+app.get('/api/recent-uploads', async (req, res) => {
+  try {
+    const csvDirectory = path.join(__dirname, 'dao', 'extrato_inter_csv');
+    const jsonDirectory = path.join(__dirname, 'dao', 'extrato_inter_json');
+    
+    // Verifica se os diretórios existem
+    if (!fs.existsSync(csvDirectory)) {
+      fs.mkdirSync(csvDirectory, { recursive: true });
+    }
+    
+    if (!fs.existsSync(jsonDirectory)) {
+      fs.mkdirSync(jsonDirectory, { recursive: true });
+    }
+    
+    // Lista todos os arquivos CSV
+    const csvFiles = fs.readdirSync(csvDirectory)
+      .filter(file => path.extname(file).toLowerCase() === '.csv')
+      .map(file => {
+        const filePath = path.join(csvDirectory, file);
+        const stats = fs.statSync(filePath);
+        
+        // Verifica se existe um JSON correspondente
+        const baseName = path.basename(file, '.csv');
+        const jsonExists = fs.existsSync(path.join(jsonDirectory, `${baseName}.json`));
+        
+        return {
+          name: file,
+          date: stats.mtime,
+          status: jsonExists ? 'success' : 'pending'
+        };
+      });
+    
+    // Ordena por data (mais recente primeiro)
+    csvFiles.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    res.json(csvFiles);
+  } catch (error) {
+    console.error('Erro ao listar arquivos recentes:', error);
+    res.status(500).json({ error: 'Falha ao listar arquivos recentes' });
+  }
+});
+
 app.use((err, req, res, next) => {
   console.error('Erro no servidor:', err);
   res.status(500).json({
@@ -232,11 +274,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-/**
- * Rota para lidar com rotas não encontradas
- */
 app.use((req, res) => {
-  console.log(`Rota não encontrada: ${req.method} ${req.url}`);
   res.status(404).json({
     success: false,
     message: 'Rota não encontrada'

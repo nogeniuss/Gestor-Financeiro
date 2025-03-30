@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: gestor-financeiro
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./dao/extrato_inter_csv:/app/dao/extrato_inter_csv
+      - ./dao/extrato_inter_json:/app/dao/extrato_inter_json
+
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MISTRAL_API_KEY=sua-chave-api-aqui  # Adicione sua chave API do Mistral
+    restart: unless-stopped

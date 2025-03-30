@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Gestor Financeiro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="config.css">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/transacoes">
+                                <i class="bi bi-currency-exchange me-2"></i>Transações
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/metas">
+                                <i class="bi bi-bullseye me-2"></i>Metas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/analise-ia">
+                                <i class="bi bi-graph-up me-2"></i>Análise IA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/upload">
+                                <i class="bi bi-upload me-2"></i>Upload
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/configuracoes">
+                                <i class="bi bi-gear me-2"></i>Configurações
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link text-danger" href="/logout">
+                                <i class="bi bi-box-arrow-right me-2"></i>Sair
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Conteúdo principal -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div id="config-container" class="container-fluid px-0">
+                    <!-- Alertas -->
+                    <div id="config-alerts"></div>
+
+                    <!-- Cabeçalho -->
+                    <header class="my-4">
+                        <h1 class="text-center">Configurações</h1>
+                        <div class="d-flex justify-content-end align-items-center mb-3">
+                            <button id="btn-save-all" class="btn btn-success">
+                                <i class="bi bi-save me-1"></i> Salvar Todas as Alterações
+                            </button>
+                        </div>
+                    </header>
+
+                    <!-- Conteúdo das Configurações -->
+                    <div class="row">
+                        <!-- Menu de navegação lateral das configurações -->
+                        <div class="col-md-3">
+                            <div class="card mb-4">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="bi bi-list-check me-2"></i>Opções
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="nav flex-column nav-pills" id="config-tabs" role="tablist">
+                                        <button class="nav-link active text-start py-3 px-4" id="perfil-tab" data-bs-toggle="pill" data-bs-target="#perfil" type="button" role="tab">
+                                            <i class="bi bi-person-circle me-2"></i>Perfil
+                                        </button>
+                                        <button class="nav-link text-start py-3 px-4" id="seguranca-tab" data-bs-toggle="pill" data-bs-target="#seguranca" type="button" role="tab">
+                                            <i class="bi bi-shield-lock me-2"></i>Segurança
+                                        </button>
+                                        <button class="nav-link text-start py-3 px-4" id="financeiro-tab" data-bs-toggle="pill" data-bs-target="#financeiro" type="button" role="tab">
+                                            <i class="bi bi-cash-coin me-2"></i>Financeiro
+                                        </button>
+                                        <button class="nav-link text-start py-3 px-4" id="categorias-tab" data-bs-toggle="pill" data-bs-target="#categorias" type="button" role="tab">
+                                            <i class="bi bi-tags me-2"></i>Categorias
+                                        </button>
+                                        <button class="nav-link text-start py-3 px-4" id="notificacoes-tab" data-bs-toggle="pill" data-bs-target="#notificacoes" type="button" role="tab">
+                                            <i class="bi bi-bell me-2"></i>Notificações
+                                        </button>
+                                        <button class="nav-link text-start py-3 px-4" id="exportacao-tab" data-bs-toggle="pill" data-bs-target="#exportacao" type="button" role="tab">
+                                            <i class="bi bi-box-arrow-up me-2"></i>Exportação
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Conteúdo das abas -->
+                        <div class="col-md-9">
+                            <div class="tab-content" id="config-tabsContent">
+                                <!-- Perfil -->
+                                <div class="tab-pane fade show active" id="perfil" role="tabpanel">
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-primary text-white">
+                                            <i class="bi bi-person-circle me-2"></i>Perfil do Usuário
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="profile-form">
+                                                <div class="row mb-4">
+                                                    <div class="col-md-3 text-center">
+                                                        <div class="profile-pic-wrapper mb-3">
+                                                            <div class="profile-pic">
+                                                                <img src="../assets/default-avatar.png" alt="Foto de perfil" id="profile-image" class="rounded-circle img-fluid">
+                                                            </div>
+                                                            <div class="profile-pic-edit mt-2">
+                                                                <label for="profile-pic-input" class="btn btn-sm btn-outline-primary">
+                                                                    <i class="bi bi-camera"></i> Alterar foto
+                                                                </label>
+                                                                <input type="file" id="profile-pic-input" accept="image/*" class="d-none">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="mb-3">
+                                                            <label for="nome" class="form-label">Nome completo</label>
+                                                            <input type="text" class="form-control" id="nome" placeholder="Seu nome completo">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="email" class="form-label">Email</label>
+                                                            <input type="email" class="form-control" id="email" placeholder="seu.email@exemplo.com">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="telefone" class="form-label">Telefone</label>
+                                                            <input type="tel" class="form-control" id="telefone" placeholder="(00) 00000-0000">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-save me-2"></i>Salvar Perfil
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Segurança -->
+                                <div class="tab-pane fade" id="seguranca" role="tabpanel">
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-primary text-white">
+                                            <i class="bi bi-shield-lock me-2"></i>Segurança da Conta
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="security-form">
+                                                <div class="mb-4">
+                                                    <h5>Alterar Senha</h5>
+                                                    <div class="mb-3">
+                                                        <label for="senha-atual" class="form-label">Senha atual</label>
+                                                        <input type="password" class="form-control" id="senha-atual">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="nova-senha" class="form-label">Nova senha</label>
+                                                        <input type="password" class="form-control" id="nova-senha">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="confirmar-senha" class="form-label">Confirmar nova senha</label>
+                                                        <input type="password" class="form-control" id="confirmar-senha">
+                                                    </div>
+                                                    <div class="password-strength mb-3">
+                                                        <label class="form-label">Força da senha:</label>
+                                                        <div class="progress">
+                                                            <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                                        </div>
+                                                        <small id="password-strength-text" class="form-text text-muted">Use uma combinação de letras, números e símbolos</small>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-4">
+                                                    <h5>Verificação em Duas Etapas</h5>
+                                                    <div class="form-check form-switch mb-3">
+                                                        <input class="form-check-input" type="checkbox" id="two-factor-auth">
+                                                        <label class="form-check-label" for="two-factor-auth">Ativar verificação em duas etapas</label>
+                                                    </div>
+                                                    <div id="two-factor-options" class="mb-3" style="display: none;">
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" type="radio" name="two-factor-method" id="two-factor-email" checked>
+                                                            <label class="form-check-label" for="two-factor-email">
+                                                                Email
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="two-factor-method" id="two-factor-sms">
+                                                            <label class="form-check-label" for="two-factor-sms">
+                                                                SMS
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-save me-2"></i>Salvar Configurações de Segurança
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Financeiro -->
+                                <div class="tab-pane fade" id="financeiro" role="tabpanel">
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-primary text-white">
+                                            <i class="bi bi-cash-coin me-2"></i>Configurações Financeiras
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="financial-form">
+                                                <div class="mb-3">
+                                                    <label for="moeda" class="form-label">Moeda padrão</label>
+                                                    <select class="form-select" id="moeda">
+                                                        <option value="BRL" selected>Real Brasileiro (R$)</option>
+                                                        <option value="USD">Dólar Americano ($)</option>
+                                                        <option value="EUR">Euro (€)</option>
+                                                        <option value="GBP">Libra Esterlina (£)</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="formato-data" class="form-label">Formato de data</label>
+                                                    <select class="form-select" id="formato-data">
+                                                        <option value="DD/MM/YYYY" selected>DD/MM/AAAA</option>
+                                                        <option value="MM/DD/YYYY">MM/DD/AAAA</option>
+                                                        <option value="YYYY-MM-DD">AAAA-MM-DD</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="dia-fechamento" class="form-label">Dia de fechamento do mês financeiro</label>
+                                                    <select class="form-select" id="dia-fechamento">
+                                                        <option value="1">Dia 1</option>
+                                                        <option value="5">Dia 5</option>
+                                                        <option value="10">Dia 10</option>
+                                                        <option value="15">Dia 15</option>
+                                                        <option value="20">Dia 20</option>
+                                                        <option value="25">Dia 25</option>
+                                                        <option value="ultimo">Último dia do mês</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="limite-orcamento" class="form-label">Limite de orçamento mensal</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">R$</span>
+                                                        <input type="number" class="form-control" id="limite-orcamento" placeholder="0.00" step="0.01">
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="alerta-orcamento" class="form-label">Alerta quando atingir (% do orçamento)</label>
+                                                    <select class="form-select" id="alerta-orcamento">
+                                                        <option value="50">50%</option>
+                                                        <option value="75">75%</option>
+                                                        <option value="80" selected>80%</option>
+                                                        <option value="90">90%</option>
+                                                        <option value="100">100%</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-save me-2"></i>Salvar Configurações Financeiras
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Categorias -->
+                                <div class="tab-pane fade" id="categorias" role="tabpanel">
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-primary text-white">
+                                            <i class="bi bi-tags me-2"></i>Gerenciar Categorias
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h5>Categorias de Despesas</h5>
+                                                    <button type="button" class="btn btn-sm btn-success" id="add-expense-category">
+                                                        <i class="bi bi-plus-circle me-1"></i>Nova Categoria
+                                                    </button>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped" id="expense-categories-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Nome</th>
+                                                                <th>Cor</th>
+                                                                <th>Limite</th>
+                                                                <th>Ações</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Alimentação</td>
+                                                                <td><span class="category-color" style="background-color: #FF5733;"></span></td>
+                                                                <td>R$ 800,00</td>
+                                                                <td>
+                                                                    <button class="btn btn-sm btn-outline-primary edit-category"><i class="bi bi-pencil"></i></button>
+                                                                    <button class="btn btn-sm btn-outline-danger delete-category"><i class="bi bi-trash"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Transporte</td>
+                                                                <td><span class="category-color" style="background-color: #3498DB;"></span></td>
+                                                                <td>R$ 500,00</td>
+                                                                <td>
+                                                                    <button class="btn btn-sm btn-outline-primary edit-category"><i class="bi bi-pencil"></i></button>
+                                                                    <button class="btn btn-sm btn-outline-danger delete-category"><i class="bi bi-trash"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h5>Categorias de Receitas</h5>
+                                                    <button type="button" class="btn btn-sm btn-success" id="add-income-category">
+                                                        <i class="bi bi-plus-circle me-1"></i>Nova Categoria
+                                                    </button>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped" id="income-categories-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Nome</th>
+                                                                <th>Cor</th>
+                                                                <th>Ações</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Salário</td>
+                                                                <td><span class="category-color" style="background-color: #2ECC71;"></span></td>
+                                                                <td>
+                                                                    <button class="btn btn-sm btn-outline-primary edit-category"><i class="bi bi-pencil"></i></button>
+                                                                    <button class="btn btn-sm btn-outline-danger delete-category"><i class="bi bi-trash"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Investimentos</td>
+                                                                <td><span class="category-color" style="background-color: #9B59B6;"></span></td>
+                                                                <td>
+                                                                    <button class="btn btn-sm btn-outline-primary edit-category"><i class="bi bi-pencil"></i></button>
+                                                                    <button class="btn btn-sm btn-outline-danger delete-category"><i class="bi bi-trash"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Notificações -->
+                                <div class="tab-pane fade" id="notificacoes" role="tabpanel">
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-primary text-white">
+                                            <i class="bi bi-bell me-2"></i>Configurações de Notificações
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="notifications-form">
+                                                <div class="mb-4">
+                                                    <h5>Notificações por Email</h5>
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="email-relatorio-mensal" checked>
+                                                        <label class="form-check-label" for="email-relatorio-mensal">Relatório mensal de gastos</label>
+                                                    </div>
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="email-alerta-orcamento" checked>
+                                                        <label class="form-check-label" for="email-alerta-orcamento">Alertas de limite de orçamento</label>
+                                                    </div>
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="email-transacoes-suspeitas">
+                                                        <label class="form-check-label" for="email-transacoes-suspeitas">Transações suspeitas</label>
+                                                    </div>
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="email-dicas-economia">
+                                                        <label class="form-check-label" for="email-dicas-economia">Dicas de economia</label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-4">
+                                                    <h5>Notificações no Aplicativo</h5>
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="app-vencimento-contas" checked>
+                                                        <label class="form-check-label" for="app-vencimento-contas">Vencimento de contas</label>
+                                                    </div>
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="app-metas-atingidas" checked>
+                                                        <label class="form-check-label" for="app-metas-atingidas">Metas atingidas</label>
+                                                    </div>
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="app-novas-funcionalidades" checked>
+                                                        <label class="form-check-label" for="app-novas-funcionalidades">Novas funcionalidades</label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-save me-2"></i>Salvar Configurações de Notificações
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Exportação -->
+                                <div class="tab-pane fade" id="exportacao" role="tabpanel">
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-primary text-white">
+                                            <i class="bi bi-box-arrow-up me-2"></i>Exportação de Dados
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-4">
+                                                <h5>Exportar Relatórios</h5>
+                                                <p class="text-muted">Exporte seus dados financeiros em diferentes formatos para análise externa.</p>
+                                                
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-md-4">
+                                                        <label for="export-period" class="form-label">Período</label>
+                                                        <select class="form-select" id="export-period">
+                                                            <option value="current-month">Mês atual</option>
+                                                            <option value="last-month">Mês anterior</option>
+                                                            <option value="last-3-months">Últimos 3 meses</option>
+                                                            <option value="last-6-months">Últimos 6 meses</option>
+                                                            <option value="current-year">Ano atual</option>
+                                                            <option value="custom">Personalizado</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="export-type" class="form-label">Tipo de Dados</label>
+                                                        <select class="form-select" id="export-type">
+                                                            <option value="all-transactions">Todas as transações</option>
+                                                            <option value="expenses">Apenas despesas</option>
+                                                            <option value="income">Apenas receitas</option>
+                                                            <option value="summary">Resumo por categoria</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="export-format" class="form-label">Formato</label>
+                                                        <select class="form-select" id="export-format">
+                                                            <option value="csv">CSV</option>
+                                                            <option value="excel">Excel</option>
+                                                            <option value="pdf">PDF</option>
+                                                            <option value="json">JSON</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div id="custom-date-range" class="row g-3 mb-3" style="display: none;">
+                                                    <div class="col-md-6">
+                                                        <label for="export-start-date" class="form-label">Data Inicial</label>
+                                                        <input type="date" class="form-control" id="export-start-date">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="export-end-date" class="form-label">Data Final</label>
+                                                        <input type="date" class="form-control" id="export-end-date">
+                                                    </div>
+                                                </div>
+                                                
+                                                <button type="button" class="btn btn-primary" id="generate-export">
+                                                    <i class="bi bi-download me-2"></i>Gerar Exportação
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="mb-4">
+                                                <h5>Backup Completo</h5>
+                                                <p class="text-muted">Faça um backup completo de todos os seus dados financeiros.</p>
+                                                <button type="button" class="btn btn-success" id="generate-backup">
+                                                    <i class="bi bi-cloud-download me-2"></i>Gerar Backup
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para edição de categoria -->
+    <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="categoryModalLabel">Editar Categoria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="category-form">
+                        <div class="mb-3">
+                            <label for="category-name" class="form-label">Nome da Categoria</label>
+                            <input type="text" class="form-control" id="category-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category-color" class="form-label">Cor</label>
+                            <input type="color" class="form-control form-control-color" id="category-color" value="#3498DB" title="Escolha a cor da categoria">
+                        </div>
+                        <div class="mb-3" id="category-limit-container">
+                            <label for="category-limit" class="form-label">Limite (opcional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" class="form-control" id="category-limit" placeholder="0.00" step="0.01">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-category">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Seu JavaScript personalizado -->
+    <script src="config.js"></script>
+</body>
+</html>

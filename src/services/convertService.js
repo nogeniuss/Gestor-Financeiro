@@ -1,170 +1,121 @@
+// convertService.js
 const fs = require('fs');
 const path = require('path');
-const Papa = require('papaparse');
+const csv = require('csvtojson');
 const multer = require('multer');
 
-// Configuração básica do Multer diretamente no arquivo
-const upload = multer({
-  dest: 'uploads/', // Pasta temporária para os uploads
-  limits: {
-    fileSize: 10 * 1024 * 1024 // Limite de 10MB
+// Configuração do Multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../../dao/extrato_inter_csv')); 
+  },
+  filename: (req, file, cb) => {
+    const fileName = Date.now() + path.extname(file.originalname);
+    cb(null, fileName);
   }
 });
 
-/**
- * Converte um arquivo CSV para JSON
- * @param {string} filePath - Caminho do arquivo a ser convertido
- * @returns {string|null} - Caminho do arquivo JSON gerado ou null em caso de erro
- */
-function convertCsvToJson(filePath) {
-  console.log(`Tentando converter ${filePath} para JSON...`);
-  
-  try {
-    // Criar diretório de saída se não existir
-    const outputDir = path.join(__dirname, '..', '..', 'dao', 'extrato_inter_json');
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-    
-    const fileName = path.basename(filePath).split('.')[0]; // Remove a extensão
-    const fileData = fs.readFileSync(filePath, 'utf8');
+const upload = multer({ storage: storage });
 
-    // Separar linhas do arquivo manualmente
-    const lines = fileData.split('\n').map(line => line.trim()).filter(line => line);
-
-    // Encontrar índice da linha onde começam as transações (cabeçalho real)
-    const headerIndex = lines.findIndex(line => 
-      line.includes("Data Lançamento") && 
-      line.includes("Histórico") && 
-      line.includes("Descrição") && 
-      line.includes("Valor") && 
-      line.includes("Saldo"));
-
-    if (headerIndex === -1) {
-      console.log("Cabeçalho não encontrado no formato esperado");
-      return null;
-    }
-
-    console.log(`Cabeçalho encontrado na linha ${headerIndex}`);
-    
-    // Extrair apenas as linhas a partir do cabeçalho (incluindo o cabeçalho)
-    const relevantLines = lines.slice(headerIndex);
-    
-    // Processar as linhas manualmente para garantir o formato correto
-    const extrato = [];
-    
-    // Pular a linha de cabeçalho
-    for (let i = 1; i < relevantLines.length; i++) {
-      const line = relevantLines[i];
-      const parts = line.split(';');
-      
-      // Verificar se a linha tem o formato esperado
-      if (parts.length >= 5) {
-        const data = parts[0].trim();
-        const historico = parts[1].trim();
-        const descricao = parts[2].trim();
-        const valor = parseFloat(parts[3].replace('.', '').replace(',', '.'));
-        const saldo = parseFloat(parts[4].replace('.', '').replace(',', '.'));
-        
-        // Criar a descrição formatada conforme solicitado
-        let descricaoFormatada = descricao;
-        if (historico.includes('Pix recebido')) {
-          descricaoFormatada = descricao.replace(/^(Pix recebido: |Pix enviado: |Compra no debito: |Compra: )/, '').trim();
-        } else if (historico.includes('Pix enviado')) {
-          descricaoFormatada = descricao.replace(/^(Pix recebido: |Pix enviado: |Compra no debito: |Compra: )/, '').trim();
-        } else if (historico.includes('Compra')) {
-          descricaoFormatada = descricao.replace(/^(Pix recebido: |Pix enviado: |Compra no debito: |Compra: )/, '').trim();
-        }
-        
-        extrato.push({
-          data,
-          descricao: descricaoFormatada,
-          valor,
-          saldo_transacao: saldo
-        });
-      }
-    }
-
-    // Criar caminho do arquivo JSON de saída
-    const outputPath = path.join(outputDir, `${fileName}.json`);
-
-    // Salvar JSON formatado
-    fs.writeFileSync(outputPath, JSON.stringify({ extrato }, null, 2));
-
-    console.log(`✅ Arquivo convertido com sucesso: ${fileName}.json`);
-    console.log(`Total de transações processadas: ${extrato.length}`);
-    return outputPath; // Retorna o caminho do arquivo JSON gerado
-  } catch (error) {
-    console.error(`❌ Erro ao converter o arquivo ${filePath}:`, error.message);
-    return null; // Retorna null em caso de erro
-  } finally {
-    // Limpar o arquivo temporário após processamento
-    try {
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        console.log(`Arquivo temporário removido: ${filePath}`);
-      }
-    } catch (err) {
-      console.error(`Erro ao remover arquivo temporário: ${err.message}`);
-    }
+// Função para garantir que o diretório existe antes de salvar o arquivo
+function ensureDirectoryExistence(filePath) {
+  const dirname = path.dirname(filePath);
+  if (!fs.existsSync(dirname)) {
+    fs.mkdirSync(dirname, { recursive: true });
   }
 }
 
-/**
- * Configura a rota de upload no aplicativo Express
- * @param {Object} app - Instância do aplicativo Express
- */
-function setupUploadRoute(app) {
-  app.post('/api/upload-csv', upload.single('file'), (req, res) => {
-    if (!req.file) {
-      return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+// Função para converter CSV para JSON
+async function convertCsvToJson(csvFilePath) {
+  console.log(`Tentando converter ${csvFilePath} para JSON...`);
+
+  try {
+    const outputDir = path.join(__dirname, '../../dao/extrato_inter_json');
+    ensureDirectoryExistence(outputDir);
+
+    const fileName = path.basename(csvFilePath, path.extname(csvFilePath));
+    const jsonFilePath = path.join(outputDir, `${fileName}.json`);
+
+    // Lê o conteúdo do arquivo CSV
+    const fileContent = fs.readFileSync(csvFilePath, 'utf-8');
+    
+    // Encontra a linha que contém os cabeçalhos
+    const lines = fileContent.split('\n');
+    let headerLineIndex = -1;
+    
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes('Data Lançamento') && lines[i].includes('Histórico') && 
+          lines[i].includes('Descrição') && lines[i].includes('Valor') && lines[i].includes('Saldo')) {
+        headerLineIndex = i;
+        break;
+      }
     }
     
-    try {
-      const filePath = req.file.path;
-      
-      // Tentar converter o arquivo
-      const jsonPath = convertCsvToJson(filePath);
-      
-      if (jsonPath) {
-        // Notificar o serviço financeiro para recarregar os dados
-        try {
-          const financialService = require('./financialService');
-          if (typeof financialService.recarregarDados === 'function') {
-            financialService.recarregarDados();
-            console.log('Dados financeiros recarregados após upload');
-          }
-        } catch (err) {
-          console.warn('Não foi possível recarregar os dados financeiros:', err.message);
-        }
-        
-        res.json({
-          success: true,
-          message: 'Arquivo convertido com sucesso',
-          jsonPath,
-          fileName: path.basename(jsonPath)
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          error: 'Erro ao converter o arquivo.'
-        });
-      }
-    } catch (error) {
-      console.error('Erro no processamento do upload:', error);
-      res.status(500).json({
-        success: false,
-        error: `Erro no servidor: ${error.message}`
-      });
+    if (headerLineIndex === -1) {
+      throw new Error('Cabeçalhos não encontrados no arquivo CSV');
     }
-  });
-  
-  console.log('Rota de upload configurada: /api/upload-csv');
+    
+    // Extrai os dados relevantes (cabeçalho + linhas de dados)
+    const relevantData = lines.slice(headerLineIndex).join('\n');
+    
+    // Escreve os dados relevantes em um arquivo temporário
+    const tempFilePath = path.join(outputDir, `temp_${fileName}.csv`);
+    fs.writeFileSync(tempFilePath, relevantData);
+    
+    // Converte o arquivo CSV para JSON usando a biblioteca csvtojson
+    const jsonArray = await csv({
+      delimiter: ';' // Define o delimitador como ponto e vírgula
+    }).fromFile(tempFilePath);
+    
+    // Remove o arquivo temporário
+    fs.unlinkSync(tempFilePath);
+
+    if (!jsonArray || jsonArray.length === 0) {
+      throw new Error('O arquivo CSV não contém dados válidos.');
+    }
+
+    // Processar os dados conforme a estrutura desejada
+    const formattedData = jsonArray.map(item => {
+      // Verificando e tratando valores
+      const valor = item['Valor'] ? parseFloat(item['Valor'].replace('.', '').replace(',', '.')) : 0;
+      const saldo = item['Saldo'] ? parseFloat(item['Saldo'].replace('.', '').replace(',', '.')) : 0;
+
+      return {
+        data: item['Data Lançamento'] || '',
+        descricao: item['Descrição'] || '',
+        modelo: item['Histórico'] || '',
+        valor: valor,
+        saldo: saldo
+      };
+    });
+
+    // Salva o JSON gerado
+    fs.writeFileSync(jsonFilePath, JSON.stringify(formattedData, null, 2));
+
+    console.log(`✅ Arquivo convertido com sucesso: ${jsonFilePath}`);
+    return jsonFilePath;
+  } catch (error) {
+    console.error(`❌ Erro ao converter o arquivo ${csvFilePath}:`, error.message);
+    return null;
+  }
 }
 
-// Adicionar o setupUploadRoute à exportação do módulo
+// Função que verifica os arquivos CSV e os converte
+function checkAndConvert() {
+  const csvDirectory = path.join(__dirname, '../../dao/extrato_inter_csv');
+  ensureDirectoryExistence(csvDirectory);
+  
+  const files = fs.readdirSync(csvDirectory);
+  const csvFiles = files.filter(file => path.extname(file).toLowerCase() === '.csv');
+
+  csvFiles.forEach(file => {
+    const filePath = path.join(csvDirectory, file);
+    convertCsvToJson(filePath);
+  });
+}
+
 module.exports = {
   convertCsvToJson,
-  setupUploadRoute,
+  checkAndConvert,
   upload
 };

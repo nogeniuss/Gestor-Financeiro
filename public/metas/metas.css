@@ -1,0 +1,174 @@
+/* Estilos para a página de metas financeiras */
+
+/* Estilos para os cards de metas */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilização do ícone do card */
+.card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+/* Estilização dos valores nos cards */
+.card-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.card-subvalue {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+/* Barra de progresso das metas */
+.meta-progresso {
+    height: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    background-color: #e9ecef;
+}
+
+.meta-progresso-bar {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.6s ease;
+}
+
+/* Ações das metas (botões) */
+.meta-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+/* Cores para os diferentes tipos de metas */
+.meta-controle {
+    border-color: #0d6efd;
+}
+
+.meta-controle .meta-progresso-bar {
+    background-color: #0d6efd;
+}
+
+.meta-poupanca {
+    border-color: #198754;
+}
+
+.meta-poupanca .meta-progresso-bar {
+    background-color: #198754;
+}
+
+.meta-investimento {
+    border-color: #0dcaf0;
+}
+
+.meta-investimento .meta-progresso-bar {
+    background-color: #0dcaf0;
+}
+
+.meta-saldo {
+    border-color: #ffc107;
+}
+
+.meta-saldo .meta-progresso-bar {
+    background-color: #ffc107;
+}
+
+.meta-outro {
+    border-color: #6c757d;
+}
+
+.meta-outro .meta-progresso-bar {
+    background-color: #6c757d;
+}
+
+/* Loader centralizado */
+#dashboard-loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilização para o modal */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Estilização para o range de progresso no modal */
+#metaProgresso {
+    cursor: pointer;
+}
+
+#valorProgresso {
+    font-weight: bold;
+}
+
+/* Estilização para mensagens de alerta */
+#alertaFeedback {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    min-width: 300px;
+}
+
+/* Estilização para a mensagem de sem metas */
+#semMetas {
+    padding: 3rem 0;
+}
+
+#semMetas .bi-emoji-smile {
+    font-size: 4rem;
+    color: #dee2e6;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .card-value {
+        font-size: 1.2rem;
+    }
+    
+    .meta-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .meta-actions button {
+        width: 100%;
+    }
+    
+    #alertaFeedback {
+        min-width: auto;
+        left: 20px;
+        right: 20px;
+    }
+}

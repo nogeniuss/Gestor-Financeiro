@@ -6,141 +6,340 @@ const listaExpressoes = require('./lista_expressoes_regulares');  // Importa as 
 const jsonDir = path.join(__dirname, '..', '..', 'dao', 'extrato_inter_json');
 console.log("financialservice carregado")
 
-function saldoAtual() {
-    console.log('Calculando saldo atual...');
-    let saldo = 0;
-
-    try {
-        // Lê os arquivos do diretório de JSON
-        const files = fs.readdirSync(jsonDir);
-        files.forEach(file => {
-            const filePath = path.join(jsonDir, file);
-            if (filePath.endsWith('.json')) {
-                const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                
-                saldo += data.saldo_transacao || 0; // Adiciona o saldo do arquivo
-            }
-        });
-    } catch (err) {
-        console.error('Erro ao ler os arquivos JSON:', err);
+function verificarCategoria(listaExpressoes, descricao) {
+    // Se não houver descrição ou lista de expressões, retorna falso
+    if (!descricao || !listaExpressoes) return false;
+    
+    // Se for uma única expressão regular
+    if (listaExpressoes instanceof RegExp) {
+      return listaExpressoes.test(descricao);
     }
-
-    // Retorna o saldo total com 2 casas decimais
-    return saldo; // O saldo agora é retornado diretamente com precisão decimal
-}
-
-function valorGastoPorData() {
-    console.log('Calculando valor gasto por data...');
-    const files = fs.readdirSync(jsonDir);
-    let result = {};
-
-    files.forEach(file => {
-        const data = JSON.parse(fs.readFileSync(path.join(jsonDir, file), 'utf8'));
-        data.extrato.forEach(entry => {
-            if (entry.valor < 0) { // Só considera saídas (valor negativo)
-                const date = entry.data;
-                if (!result[date]) result[date] = 0;
-                result[date] += entry.valor; // Mantém o valor negativo
-            }
-        });
-    });
-
-    return result;
-}
-
-function saldoTotalPorDia() {
-    console.log('Calculando saldo total por dia...');
-    const files = fs.readdirSync(jsonDir);
-    let result = {};
-
-    files.forEach(file => {
-        const data = JSON.parse(fs.readFileSync(path.join(jsonDir, file), 'utf8'));
-        data.extrato.forEach(entry => {
-            const date = entry.data;
-            const saldoTransacao = parseFloat(entry.saldo_transacao); // Converte para float
-            const valor = parseFloat(entry.valor); // O valor da transação
-
-            // Verifica se ambos os valores (saldo_transacao e valor) são positivos e válidos
-            if (valor > 0 && !isNaN(saldoTransacao) && saldoTransacao > 0) {
-                if (!result[date]) result[date] = 0;
-
-                // Somamos apenas os valores positivos de saldo
-                result[date] += saldoTransacao;
-            }
-        });
-    });
-
-    return result;
-}
-
-function valorPorCategoria() {
-    console.log('Calculando valor por categoria...');
-    const files = fs.readdirSync(jsonDir);
-    let result = {};
-
-    files.forEach(file => {
-        const data = JSON.parse(fs.readFileSync(path.join(jsonDir, file), 'utf8'));
-        data.extrato.forEach(entry => {
-            const descricao = entry.descricao;
-            let categoria = '';
-
-            // Categorias baseadas em expressões regulares mais abrangentes
-            if (verificarCategoria(listaExpressoes.transferenciaPessoa, descricao)) {
-                categoria = 'Transferência (Pessoa)';
-            } else if (verificarCategoria(listaExpressoes.uber, descricao)) {
-                categoria = 'Uber';
-            } else if (verificarCategoria(listaExpressoes.alimentacao, descricao)) {
-                categoria = 'Alimentação';
-            } else if (verificarCategoria(listaExpressoes.apostas, descricao)) {
-                categoria = 'Apostas';
-            } else if (verificarCategoria(listaExpressoes.aluguel, descricao)) {
-                categoria = 'Aluguel';
-            } else if (verificarCategoria(listaExpressoes.agua, descricao)) {
-                categoria = 'Água';
-            } else if (verificarCategoria(listaExpressoes.luz, descricao)) {
-                categoria = 'Luz';
-            } else if (verificarCategoria(listaExpressoes.dogs, descricao)) {
-                categoria = 'Dogs';
-            } else if (verificarCategoria(listaExpressoes.gas, descricao)) {
-                categoria = 'Gás';
-            } else {
-                categoria = 'Outras'; // Se não encontrar categoria específica
-            }
-
-            // Acumula o valor por categoria
-            if (!result[categoria]) result[categoria] = 0;
-            result[categoria] += Math.abs(entry.valor); // Considera sempre o valor absoluto
-        });
-    });
-
-    return result;
-}
-
-function verificarCategoria(expressoes, descricao) {
-    console.log('Verificando categoria para: ' + descricao);
-    if (!expressoes || !descricao) return false;
-
-    // Função para escapar caracteres especiais da expressão regular
-    function escaparCaractereEspecial(termo) {
-        return termo.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&"); // Escapa caracteres especiais
-    }
-
-    // Limpar as aspas duplas e outros caracteres não relevantes
-    descricao = descricao.replace(/"/g, "").trim(); // Remover todas as aspas
-    descricao = descricao.replace(/[^a-zA-Z0-9\s]/g, ""); // Remove caracteres especiais como -, : e outros
-
-    for (const termo of expressoes) {
-        const termoEscapado = escaparCaractereEspecial(termo); // Escapa o termo antes de criar a regex
-        const regex = new RegExp(termoEscapado, 'i'); // Regex para procurar o termo insensível a maiúsculas
-        if (regex.test(descricao)) {
-            console.log('Categoria encontrada: ' + termo); // Colocando o log antes do return
-            return true; // Encontrou uma correspondência
+    
+    // Se for um array de expressões regulares
+    if (Array.isArray(listaExpressoes)) {
+      return listaExpressoes.some(expr => {
+        if (expr instanceof RegExp) {
+          return expr.test(descricao);
+        } else if (typeof expr === 'string') {
+          return descricao.toLowerCase().includes(expr.toLowerCase());
         }
+        return false;
+      });
     }
-    console.log('Categoria não encontrada');
-    return false; // Nenhuma correspondência foi encontrada
-}
-
+    
+    // Se for uma string
+    if (typeof listaExpressoes === 'string') {
+      return descricao.toLowerCase().includes(listaExpressoes.toLowerCase());
+    }
+    
+    return false;
+  }
+function saldoAtual(dataInicio, dataFim) {
+    console.log('Calculando saldo atual...');
+    
+    // Inicializa o saldo inicial como 0
+    let saldoInicial = 0;
+    // Array para armazenar todas as transações
+    let todasTransacoes = obterTodasTransacoes();
+  
+    try {
+      // Ordena as transações por data (da mais antiga para a mais recente)
+      todasTransacoes.sort((a, b) => {
+        const dataA = new Date(a.data.split('/').reverse().join('-'));
+        const dataB = new Date(b.data.split('/').reverse().join('-'));
+        return dataA - dataB;
+      });
+      
+      // Filtra as transações pelo período especificado
+      if (dataInicio || dataFim) {
+        todasTransacoes = todasTransacoes.filter(transacao => {
+          // Converte a data da transação para objeto Date (formato DD/MM/YYYY para YYYY-MM-DD)
+          const partes = transacao.data.split('/');
+          const dataTransacao = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+          
+          // Verifica se está dentro do período
+          if (dataInicio && dataFim) {
+            return dataTransacao >= dataInicio && dataTransacao <= dataFim;
+          } else if (dataInicio) {
+            return dataTransacao >= dataInicio;
+          } else if (dataFim) {
+            return dataTransacao <= dataFim;
+          }
+          return true;
+        });
+      }
+      
+      // Calcula o saldo com base nas transações filtradas
+      let saldoFinal = saldoInicial;
+      todasTransacoes.forEach(transacao => {
+        saldoFinal += transacao.valor || 0;
+      });
+      
+      // Garante que o saldo não seja negativo
+      saldoFinal = Math.max(0, saldoFinal);
+      
+      // Retorna o saldo com 2 casas decimais
+      return parseFloat(saldoFinal.toFixed(2));
+      
+    } catch (err) {
+      console.error('Erro ao calcular saldo atual:', err);
+      return 0.00; // Retorna zero em caso de erro
+    }
+  }
+function valorGastoPorData(dataInicio = null, dataFim = null) {
+    console.log('Calculando valor gasto por data...');
+    let result = {};
+  
+    try {
+      // Obter todas as transações
+      const todasTransacoes = obterTodasTransacoes();
+      
+      // Filtrar por período, se especificado
+      let transacoesFiltradas = todasTransacoes;
+      if (dataInicio || dataFim) {
+        transacoesFiltradas = todasTransacoes.filter(transacao => {
+          // Converte a data da transação para objeto Date (formato DD/MM/YYYY para YYYY-MM-DD)
+          const partes = transacao.data.split('/');
+          const dataTransacao = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+          
+          // Verifica se está dentro do período
+          if (dataInicio && dataFim) {
+            return dataTransacao >= dataInicio && dataTransacao <= dataFim;
+          } else if (dataInicio) {
+            return dataTransacao >= dataInicio;
+          } else if (dataFim) {
+            return dataTransacao <= dataFim;
+          }
+          return true;
+        });
+      }
+      
+      // Agrupar gastos por data
+      transacoesFiltradas.forEach(transacao => {
+        if (transacao.valor < 0) { // Só considera saídas (valor negativo)
+          const data = transacao.data;
+          if (!result[data]) result[data] = 0;
+          result[data] += Math.abs(transacao.valor); // Converte para valor positivo para representar gastos
+        }
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('Erro ao calcular valor gasto por data:', error);
+      return {};
+    }
+  }
+function saldoTotalPorDia(dataInicio = null, dataFim = null) {
+    console.log('Calculando saldo total por dia...');
+    let result = {};
+  
+    try {
+      // Obter todas as transações
+      const todasTransacoes = obterTodasTransacoes();
+      
+      // Ordenar transações por data
+      todasTransacoes.sort((a, b) => {
+        const dataA = new Date(a.data.split('/').reverse().join('-'));
+        const dataB = new Date(b.data.split('/').reverse().join('-'));
+        return dataA - dataB;
+      });
+      
+      // Filtrar por período, se especificado
+      let transacoesFiltradas = todasTransacoes;
+      if (dataInicio || dataFim) {
+        transacoesFiltradas = todasTransacoes.filter(transacao => {
+          // Converte a data da transação para objeto Date (formato DD/MM/YYYY para YYYY-MM-DD)
+          const partes = transacao.data.split('/');
+          const dataTransacao = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+          
+          // Verifica se está dentro do período
+          if (dataInicio && dataFim) {
+            return dataTransacao >= dataInicio && dataTransacao <= dataFim;
+          } else if (dataInicio) {
+            return dataTransacao >= dataInicio;
+          } else if (dataFim) {
+            return dataTransacao <= dataFim;
+          }
+          return true;
+        });
+      }
+      
+      // Calcular saldo acumulado por dia
+      let saldoAcumulado = 0;
+      
+      // Agrupar transações por data
+      const transacoesPorData = {};
+      transacoesFiltradas.forEach(transacao => {
+        const data = transacao.data;
+        if (!transacoesPorData[data]) {
+          transacoesPorData[data] = [];
+        }
+        transacoesPorData[data].push(transacao);
+      });
+      
+      // Processar cada data em ordem cronológica
+      const datasOrdenadas = Object.keys(transacoesPorData).sort((a, b) => {
+        const dataA = new Date(a.split('/').reverse().join('-'));
+        const dataB = new Date(b.split('/').reverse().join('-'));
+        return dataA - dataB;
+      });
+      
+      datasOrdenadas.forEach(data => {
+        // Processar todas as transações do dia
+        transacoesPorData[data].forEach(transacao => {
+          saldoAcumulado += transacao.valor || 0;
+        });
+        
+        // Garantir que o saldo não seja negativo
+        saldoAcumulado = Math.max(0, saldoAcumulado);
+        
+        // Armazenar o saldo do dia
+        result[data] = parseFloat(saldoAcumulado.toFixed(2));
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('Erro ao calcular saldo total por dia:', error);
+      return {};
+    }
+  }  
+function valorPorCategoria(dataInicio = null, dataFim = null) {
+    console.log('Calculando valor por categoria...');
+    
+    // Importar as expressões regulares com o caminho correto
+    let listaExpressoes;
+    try {
+      console.log('Expressões regulares carregadas:', Object.keys(listaExpressoes));
+    } catch (error) {
+      console.error('Erro ao carregar expressões regulares:', error);
+      listaExpressoes = {}; // Objeto vazio como fallback
+    }
+    
+    let result = {
+      'Uber': 0,
+      'Alimentação': 0,
+      'Apostas': 0,
+      'Aluguel': 0,
+      'Energia': 0, // Água e Luz
+      'Dogs': 0,
+      'Gás': 0,
+      'Pix Recebido': 0,
+      'Pix Enviado': 0,
+      'Transferências': 0, // Nova categoria para transferências bancárias
+      'Investimentos': 0,
+      'Outras': 0
+    };
+  
+    try {
+      // Obter todas as transações
+      const todasTransacoes = obterTodasTransacoes();
+      
+      // Filtrar por período, se especificado
+      let transacoesFiltradas = todasTransacoes;
+      if (dataInicio || dataFim) {
+        transacoesFiltradas = todasTransacoes.filter(transacao => {
+          // Converte a data da transação para objeto Date (formato DD/MM/YYYY para YYYY-MM-DD)
+          const partes = transacao.data.split('/');
+          const dataTransacao = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+          
+          // Verifica se está dentro do período
+          if (dataInicio && dataFim) {
+            return dataTransacao >= dataInicio && dataTransacao <= dataFim;
+          } else if (dataInicio) {
+            return dataTransacao >= dataInicio;
+          } else if (dataFim) {
+            return dataTransacao <= dataFim;
+          }
+          return true;
+        });
+      }
+      
+      // Processar cada transação
+      transacoesFiltradas.forEach(transacao => {
+        const descricao = transacao.descricao;
+        const modelo = transacao.modelo;
+        const valor = Math.abs(transacao.valor); // Sempre usamos o valor absoluto
+        const ehDebito = transacao.valor < 0; // Se o valor é negativo, é uma saída (débito)
+        
+        // Verificar se é um Pix
+        if (/pix/i.test(modelo)) {
+          // Verificar se é Pix enviado ou recebido
+          if (/recebido/i.test(modelo) || !ehDebito) {
+            result['Pix Recebido'] += valor;
+          } else {
+            result['Pix Enviado'] += valor;
+          }
+          return; // Já categorizamos, podemos pular para a próxima transação
+        }
+        
+        // Verificar se é uma transferência (não Pix)
+        if (/transfer[eê]ncia/i.test(modelo) || /ted/i.test(modelo) || /doc/i.test(modelo)) {
+          result['Transferências'] += valor;
+          return; // Já categorizamos, podemos pular para a próxima transação
+        }
+        
+        // Categorizar com base na descrição
+        if (listaExpressoes.uber && verificarCategoria(listaExpressoes.uber, descricao)) {
+          result['Uber'] += valor;
+        } else if (listaExpressoes.alimentacao && verificarCategoria(listaExpressoes.alimentacao, descricao)) {
+          result['Alimentação'] += valor;
+        } else if (listaExpressoes.apostas && verificarCategoria(listaExpressoes.apostas, descricao)) {
+          result['Apostas'] += valor;
+        } else if (listaExpressoes.aluguel && verificarCategoria(listaExpressoes.aluguel, descricao)) {
+          result['Aluguel'] += valor;
+        } else if (listaExpressoes.agua && verificarCategoria(listaExpressoes.agua, descricao)) {
+          result['Energia'] += valor;
+        } else if (listaExpressoes.dogs && verificarCategoria(listaExpressoes.dogs, descricao)) {
+          result['Dogs'] += valor;
+        } else if (listaExpressoes.gas && verificarCategoria(listaExpressoes.gas, descricao)) {
+          result['Gás'] += valor;
+        } else if (listaExpressoes.investimentos && verificarCategoria(listaExpressoes.investimentos, descricao)) {
+          result['Investimentos'] += valor;
+        } else if (listaExpressoes.transferenciaPessoa && verificarCategoria(listaExpressoes.transferenciaPessoa, descricao)) {
+          result['Transferências'] += valor;
+        } else {
+          // Verificar se é uma compra no débito e tentar categorizar
+          if (/compra no débito/i.test(modelo) || /debito/i.test(modelo)) {
+            if (/uber/i.test(descricao) || /99/i.test(descricao) || /taxi/i.test(descricao)) {
+              result['Uber'] += valor;
+            } else if (/mercado/i.test(descricao) || /super/i.test(descricao) || 
+                      /aliment/i.test(descricao) || /rest/i.test(descricao) || 
+                      /lanche/i.test(descricao) || /cafe/i.test(descricao) ||
+                      /aqua magic/i.test(descricao)) {
+              result['Alimentação'] += valor;
+            } else {
+              result['Outras'] += valor;
+            }
+          } else {
+            result['Outras'] += valor;
+          }
+        }
+      });
+      
+      // Formatar valores com 2 casas decimais
+      Object.keys(result).forEach(key => {
+        result[key] = parseFloat(result[key].toFixed(2));
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('Erro ao calcular valor por categoria:', error);
+      return {
+        'Uber': 0,
+        'Alimentação': 0,
+        'Apostas': 0,
+        'Aluguel': 0,
+        'Energia': 0,
+        'Dogs': 0,
+        'Gás': 0,
+        'Pix Recebido': 0,
+        'Pix Enviado': 0,
+        'Transferências': 0,
+        'Investimentos': 0,
+        'Outras': 0
+      };
+    }
+  }
 function convertStringToDate(dateString) {
     if (!dateString) return null;
     
@@ -156,461 +355,843 @@ function convertStringToDate(dateString) {
     
     // Se não for no formato esperado, tenta converter diretamente
     return new Date(dateString);
-}
-
+  }
 function filtroCategoriaData(categoria, dataInicio, dataFim) {
     console.log('Filtrando transações por categoria e intervalo de datas...');
     console.log('Parâmetros recebidos:', { categoria, dataInicio, dataFim });
+  
+    // Converter datas de string para objetos Date uma única vez
+    const startDate = dataInicio ? convertStringToDate(dataInicio) : null;
+    const endDate = dataFim ? convertStringToDate(dataFim) : null;
     
-    const files = fs.readdirSync(jsonDir);
-    console.log(`Encontrados ${files.length} arquivos para processar`);
+    if (startDate && endDate && startDate > endDate) {
+      console.error('Data inicial é posterior à data final');
+      return [];
+    }
     
-    let result = [];
-    
+    // Carregar expressões regulares para categorização
+    let listaExpressoes;
     try {
-        // Itera sobre cada arquivo JSON
-        files.forEach(file => {
-            if (file.endsWith('.json')) {
-                const filePath = path.join(jsonDir, file);
-                console.log(`Processando arquivo: ${filePath}`);
-                
-                const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                
-                // Verifica cada entrada do extrato
-                if (data.extrato && data.extrato.length > 0) {
-                    console.log(`Arquivo contém ${data.extrato.length} transações`);
-                    
-                    data.extrato.forEach(entry => {
-                        let incluirTransacao = true;
-                        
-                        // Filtra por data
-                        if (dataInicio && dataFim) {
-                            const entryDate = convertStringToDate(entry.data);
-                            const startDate = convertStringToDate(dataInicio);
-                            const endDate = convertStringToDate(dataFim);
-                            
-                            console.log(`Comparando datas: ${entry.data} (${entryDate}) com intervalo ${dataInicio} (${startDate}) - ${dataFim} (${endDate})`);
-                            
-                            if (entryDate < startDate || entryDate > endDate) {
-                                incluirTransacao = false;
-                                console.log(`Transação de ${entry.data} fora do intervalo de datas`);
-                            }
-                        }
-                        
-                        // Filtra por categoria
-                        if (incluirTransacao && categoria) {
-                            const descricao = entry.descricao;
-                            let categoriaTransacao = '';
-                            
-                            // Determina a categoria da transação
-                            if (verificarCategoria(listaExpressoes.transferenciaPessoa, descricao)) {
-                                categoriaTransacao = 'Transferência (Pessoa)';
-                            } else if (verificarCategoria(listaExpressoes.uber, descricao)) {
-                                categoriaTransacao = 'Uber';
-                            } else if (verificarCategoria(listaExpressoes.alimentacao, descricao)) {
-                                categoriaTransacao = 'Alimentação';
-                            } else if (verificarCategoria(listaExpressoes.apostas, descricao)) {
-                                categoriaTransacao = 'Apostas';
-                            } else if (verificarCategoria(listaExpressoes.aluguel, descricao)) {
-                                categoriaTransacao = 'Aluguel';
-                            } else if (verificarCategoria(listaExpressoes.agua, descricao)) {
-                                categoriaTransacao = 'Água';
-                            } else if (verificarCategoria(listaExpressoes.luz, descricao)) {
-                                categoriaTransacao = 'Luz';
-                            } else if (verificarCategoria(listaExpressoes.dogs, descricao)) {
-                                categoriaTransacao = 'Dogs';
-                            } else if (verificarCategoria(listaExpressoes.gas, descricao)) {
-                                categoriaTransacao = 'Gás';
-                            } else {
-                                categoriaTransacao = 'Outras';
-                            }
-                            
-                            console.log(`Categoria da transação: "${categoriaTransacao}", Categoria filtro: "${categoria}"`);
-                            
-                            if (categoriaTransacao !== categoria) {
-                                incluirTransacao = false;
-                                console.log(`Transação excluída por categoria diferente`);
-                            }
-                        }
-                        
-                        // Adiciona a transação ao resultado se passou pelos filtros
-                        if (incluirTransacao) {
-                            console.log(`Transação incluída no resultado: ${entry.data} - ${entry.descricao}`);
-                            result.push(entry);
-                        }
-                    });
-                }
+      listaExpressoes = require('./lista_expressoes_regulares');
+      console.log('Expressões regulares carregadas:', Object.keys(listaExpressoes));
+    } catch (error) {
+      console.error('Erro ao carregar expressões regulares:', error);
+      listaExpressoes = {};
+    }
+    
+    // Verificar se o diretório existe
+    if (!fs.existsSync(jsonDir)) {
+      console.error(`Diretório não encontrado: ${jsonDir}`);
+      return [];
+    }
+    
+    // Obter lista de arquivos
+    const files = fs.readdirSync(jsonDir).filter(file => file.endsWith('.json'));
+    console.log(`Encontrados ${files.length} arquivos JSON para processar`);
+    
+    if (files.length === 0) {
+      console.warn('Nenhum arquivo JSON encontrado');
+      return [];
+    }
+  
+    let result = [];
+  
+    try {
+      // Função auxiliar para determinar a categoria de uma transação
+      function determinarCategoria(transacao) {
+        const descricao = transacao.descricao || '';
+        const modelo = transacao.modelo || '';
+        const valor = transacao.valor || 0;
+        const ehDebito = valor < 0;
+        
+        // Verificar se é um Pix
+        if (/pix/i.test(modelo)) {
+          return /recebido/i.test(modelo) || !ehDebito ? 'Pix Recebido' : 'Pix Enviado';
+        }
+        
+        // Verificar se é uma transferência (não Pix)
+        if (/transfer[eê]ncia/i.test(modelo) || /ted/i.test(modelo) || /doc/i.test(modelo)) {
+          return 'Transferências';
+        }
+        
+        // Mapeamento de verificações de categoria
+        const categoriasMap = [
+          { check: listaExpressoes.uber, name: 'Uber' },
+          { check: listaExpressoes.alimentacao, name: 'Alimentação' },
+          { check: listaExpressoes.apostas, name: 'Apostas' },
+          { check: listaExpressoes.aluguel, name: 'Aluguel' },
+          { check: listaExpressoes.agua, name: 'Energia' }, // Água e Luz agora são "Energia"
+          { check: listaExpressoes.luz, name: 'Energia' },
+          { check: listaExpressoes.dogs, name: 'Dogs' },
+          { check: listaExpressoes.gas, name: 'Gás' },
+          { check: listaExpressoes.investimentos, name: 'Investimentos' },
+          { check: listaExpressoes.transferenciaPessoa, name: 'Transferências' }
+        ];
+        
+        // Verificar cada categoria
+        for (const cat of categoriasMap) {
+          if (cat.check && verificarCategoria(cat.check, descricao)) {
+            return cat.name;
+          }
+        }
+        
+        // Verificar se é uma compra no débito e tentar categorizar
+        if (/compra no débito/i.test(modelo) || /debito/i.test(modelo)) {
+          if (/uber/i.test(descricao) || /99/i.test(descricao) || /taxi/i.test(descricao)) {
+            return 'Uber';
+          } else if (/mercado/i.test(descricao) || /super/i.test(descricao) || 
+                    /aliment/i.test(descricao) || /rest/i.test(descricao) || 
+                    /lanche/i.test(descricao) || /cafe/i.test(descricao)) {
+            return 'Alimentação';
+          }
+        }
+        
+        return 'Outras';
+      }
+      
+      // Processar cada arquivo
+      for (const file of files) {
+        const filePath = path.join(jsonDir, file);
+        console.log(`Processando arquivo: ${filePath}`);
+        
+        let fileData;
+        try {
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          fileData = JSON.parse(fileContent);
+        } catch (error) {
+          console.error(`Erro ao ler/parsear arquivo ${file}:`, error);
+          continue; // Pula para o próximo arquivo
+        }
+        
+        // Verificar estrutura do arquivo
+        const transacoes = fileData.extrato || fileData;
+        if (!Array.isArray(transacoes)) {
+          console.warn(`Arquivo ${file} não contém um array de transações válido`);
+          continue;
+        }
+        
+        console.log(`Arquivo contém ${transacoes.length} transações`);
+        
+        // Filtrar transações do arquivo
+        const transacoesFiltradas = transacoes.filter(entry => {
+          // Verificar se a transação tem dados válidos
+          if (!entry || !entry.data) {
+            console.warn('Transação com dados incompletos:', entry);
+            return false;
+          }
+          
+          // Filtrar por data
+          if (startDate || endDate) {
+            const entryDate = convertStringToDate(entry.data);
+            
+            if (!entryDate) {
+              console.warn(`Data inválida na transação: ${entry.data}`);
+              return false;
             }
+            
+            if (startDate && entryDate < startDate) {
+              return false;
+            }
+            
+            if (endDate && entryDate > endDate) {
+              return false;
+            }
+          }
+          
+          // Filtrar por categoria
+          if (categoria) {
+            const categoriaTransacao = determinarCategoria(entry);
+            return categoriaTransacao === categoria;
+          }
+          
+          return true;
         });
         
-        console.log(`Total de transações após filtro: ${result.length}`);
-        return result;
+        // Adicionar transações filtradas ao resultado
+        result = result.concat(transacoesFiltradas);
+      }
+      
+      console.log(`Total de transações após filtro: ${result.length}`);
+      return result;
+      
     } catch (error) {
-        console.error('Erro ao processar o filtro de categoria e data:', error);
-        throw new Error('Erro ao processar os filtros');
+      console.error('Erro ao processar o filtro de categoria e data:', error);
+      throw new Error(`Erro ao processar os filtros: ${error.message}`);
     }
-}
-
-
+  }
 function obterPeriodoExtrato() {
     console.log('Obtendo período do extrato...');
-    const files = fs.readdirSync(jsonDir);
+    
+    // Verificar se o diretório existe
+    if (!fs.existsSync(jsonDir)) {
+      console.error(`Diretório não encontrado: ${jsonDir}`);
+      return { dataInicial: null, dataFinal: null };
+    }
+    
+    const files = fs.readdirSync(jsonDir).filter(file => file.endsWith('.json'));
+    console.log(`Encontrados ${files.length} arquivos JSON para processar`);
+    
+    if (files.length === 0) {
+      console.warn('Nenhum arquivo JSON encontrado');
+      return { dataInicial: null, dataFinal: null };
+    }
+    
     let dataInicial = null;
     let dataFinal = null;
-
+  
     try {
-        files.forEach(file => {
-            if (file.endsWith('.json')) {
-                const filePath = path.join(jsonDir, file);
-                const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                
-                if (data.extrato && data.extrato.length > 0) {
-                    data.extrato.forEach(entry => {
-                        const dataStr = entry.data;
-                        const dataObj = convertStringToDate(dataStr);
-                        
-                        if (!dataInicial || dataObj < dataInicial) {
-                            dataInicial = dataObj;
-                        }
-                        
-                        if (!dataFinal || dataObj > dataFinal) {
-                            dataFinal = dataObj;
-                        }
-                    });
-                }
-            }
-        });
+      for (const file of files) {
+        const filePath = path.join(jsonDir, file);
+        console.log(`Processando arquivo: ${filePath}`);
+        
+        let fileData;
+        try {
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          fileData = JSON.parse(fileContent);
+        } catch (error) {
+          console.error(`Erro ao ler/parsear arquivo ${file}:`, error);
+          continue; // Pula para o próximo arquivo
+        }
+        
+        // Verificar estrutura do arquivo - aceita tanto data.extrato quanto um array direto
+        const transacoes = fileData.extrato || (Array.isArray(fileData) ? fileData : null);
+        if (!transacoes || !Array.isArray(transacoes) || transacoes.length === 0) {
+          console.warn(`Arquivo ${file} não contém transações válidas`);
+          continue;
+        }
+        
+        // Processar cada transação
+        for (const entry of transacoes) {
+          if (!entry || !entry.data) {
+            continue; // Pula transações sem data
+          }
+          
+          const dataObj = convertStringToDate(entry.data);
+          if (!dataObj || isNaN(dataObj.getTime())) {
+            console.warn(`Data inválida na transação: ${entry.data}`);
+            continue;
+          }
+          
+          if (!dataInicial || dataObj < dataInicial) {
+            dataInicial = dataObj;
+          }
+          
+          if (!dataFinal || dataObj > dataFinal) {
+            dataFinal = dataObj;
+          }
+        }
+      }
     } catch (error) {
-        console.error('Erro ao obter período do extrato:', error);
+      console.error('Erro ao obter período do extrato:', error);
     }
-    
+  
     // Formata as datas para o formato dd/mm/yyyy
     const formatarData = (data) => {
-        if (!data) return null;
-        const dia = String(data.getDate()).padStart(2, '0');
-        const mes = String(data.getMonth() + 1).padStart(2, '0');
-        const ano = data.getFullYear();
-        return `${dia}/${mes}/${ano}`;
+      if (!data) return null;
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    };
+  
+    const resultado = {
+      dataInicial: formatarData(dataInicial),
+      dataFinal: formatarData(dataFinal)
     };
     
-    return {
-        dataInicial: formatarData(dataInicial),
-        dataFinal: formatarData(dataFinal)
-    };
-}
-
+    console.log(`Período encontrado: ${resultado.dataInicial || 'N/A'} até ${resultado.dataFinal || 'N/A'}`);
+    return resultado;
+  }
 function obterTransacoesRecentes(limite = 10) {
-    console.log('Obtendo transações mais recentes...');
-    const files = fs.readdirSync(jsonDir);
-    let transacoes = [];
-
-    try {
-        files.forEach(file => {
-            if (file.endsWith('.json')) {
-                const filePath = path.join(jsonDir, file);
-                const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                
-                if (data.extrato && data.extrato.length > 0) {
-                    transacoes = transacoes.concat(data.extrato);
-                }
-            }
-        });
-        
-        // Ordena as transações por data (mais recente primeiro)
-        transacoes.sort((a, b) => {
-            const dataA = convertStringToDate(a.data);
-            const dataB = convertStringToDate(b.data);
-            return dataB - dataA;
-        });
-        
-        // Limita o número de transações
-        transacoes = transacoes.slice(0, limite);
-        
-        // Formata os valores
-        transacoes = transacoes.map(transacao => {
-            return {
-                ...transacao,
-                valorFormatado: new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                }).format(transacao.valor),
-                saldoFormatado: new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                }).format(transacao.saldo_transacao)
-            };
-        });
-        
-    } catch (error) {
-        console.error('Erro ao obter transações recentes:', error);
+    console.log(`Obtendo ${limite} transações mais recentes...`);
+    
+    // Verificar se o diretório existe
+    if (!fs.existsSync(jsonDir)) {
+      console.error(`Diretório não encontrado: ${jsonDir}`);
+      return [];
     }
     
-    return transacoes;
-}
-
+    const files = fs.readdirSync(jsonDir).filter(file => file.endsWith('.json'));
+    console.log(`Encontrados ${files.length} arquivos JSON para processar`);
+    
+    if (files.length === 0) {
+      console.warn('Nenhum arquivo JSON encontrado');
+      return [];
+    }
+    
+    let transacoes = [];
+  
+    try {
+      // Processar cada arquivo
+      for (const file of files) {
+        const filePath = path.join(jsonDir, file);
+        
+        let fileData;
+        try {
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          fileData = JSON.parse(fileContent);
+        } catch (error) {
+          console.error(`Erro ao ler/parsear arquivo ${file}:`, error);
+          continue; // Pula para o próximo arquivo
+        }
+        
+        // Verificar estrutura do arquivo - aceita tanto data.extrato quanto um array direto
+        const fileTransacoes = fileData.extrato || (Array.isArray(fileData) ? fileData : null);
+        if (!fileTransacoes || !Array.isArray(fileTransacoes)) {
+          console.warn(`Arquivo ${file} não contém transações válidas`);
+          continue;
+        }
+        
+        // Filtrar transações com dados válidos
+        const validTransacoes = fileTransacoes.filter(t => 
+          t && t.data && (t.valor !== undefined || t.valor !== null)
+        );
+        
+        transacoes = transacoes.concat(validTransacoes);
+      }
+      
+      // Verificar se há transações
+      if (transacoes.length === 0) {
+        console.warn('Nenhuma transação válida encontrada');
+        return [];
+      }
+      
+      // Ordenar as transações por data (mais recente primeiro)
+      transacoes.sort((a, b) => {
+        const dataA = convertStringToDate(a.data);
+        const dataB = convertStringToDate(b.data);
+        
+        // Verificar se as datas são válidas
+        if (!dataA || !dataB) {
+          return 0; // Manter a ordem se alguma data for inválida
+        }
+        
+        return dataB - dataA;
+      });
+      
+      // Limitar o número de transações
+      transacoes = transacoes.slice(0, limite);
+      
+      // Formatar os valores
+      transacoes = transacoes.map(transacao => {
+        // Formatador de moeda
+        const formatarMoeda = (valor) => {
+          return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+          }).format(valor || 0);
+        };
+        
+        return {
+          ...transacao,
+          valorFormatado: formatarMoeda(transacao.valor),
+          // Verifica qual propriedade de saldo existe
+          saldoFormatado: formatarMoeda(
+            transacao.saldo_transacao !== undefined ? 
+            transacao.saldo_transacao : transacao.saldo
+          )
+        };
+      });
+      
+      console.log(`Retornando ${transacoes.length} transações recentes`);
+      return transacoes;
+      
+    } catch (error) {
+      console.error('Erro ao obter transações recentes:', error);
+      return [];
+    }
+  }
 function calcularResumoFinanceiro(transacoes = null) {
     console.log('Calculando resumo financeiro...');
+    
     // Inicializa o objeto de resumo
     const resumo = {
-        saldoAtual: { valor: 0, valorFormatado: 'R$ 0,00' },
-        totalGastos: { valor: 0, valorFormatado: 'R$ 0,00' },
-        gastosPorData: {},
-        saldoPorDia: {},
-        valorPorCategoria: {},
-        periodoExtrato: { dataInicial: null, dataFinal: null }
+      saldoAtual: { valor: 0, valorFormatado: 'R$ 0,00' },
+      totalGastos: { valor: 0, valorFormatado: 'R$ 0,00' },
+      gastosPorData: {},
+      saldoPorDia: {},
+      valorPorCategoria: {},
+      periodoExtrato: { dataInicial: null, dataFinal: null }
     };
     
     // Se não foram fornecidas transações, lê todas dos arquivos
     if (!transacoes) {
-        transacoes = [];
-        const files = fs.readdirSync(jsonDir);
+      try {
+        // Verificar se o diretório existe
+        if (!fs.existsSync(jsonDir)) {
+          console.error(`Diretório não encontrado: ${jsonDir}`);
+          return resumo;
+        }
         
-        files.forEach(file => {
-            if (file.endsWith('.json')) {
-                const filePath = path.join(jsonDir, file);
-                const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                
-                if (data.extrato && data.extrato.length > 0) {
-                    transacoes = transacoes.concat(data.extrato);
-                }
-            }
-        });
+        transacoes = [];
+        const files = fs.readdirSync(jsonDir).filter(file => file.endsWith('.json'));
+        console.log(`Encontrados ${files.length} arquivos JSON para processar`);
+        
+        if (files.length === 0) {
+          console.warn('Nenhum arquivo JSON encontrado');
+          return resumo;
+        }
+        
+        // Processar cada arquivo
+        for (const file of files) {
+          const filePath = path.join(jsonDir, file);
+          
+          let fileData;
+          try {
+            const fileContent = fs.readFileSync(filePath, 'utf8');
+            fileData = JSON.parse(fileContent);
+          } catch (error) {
+            console.error(`Erro ao ler/parsear arquivo ${file}:`, error);
+            continue; // Pula para o próximo arquivo
+          }
+          
+          // Verificar estrutura do arquivo - aceita tanto data.extrato quanto um array direto
+          const fileTransacoes = fileData.extrato || (Array.isArray(fileData) ? fileData : null);
+          if (!fileTransacoes || !Array.isArray(fileTransacoes)) {
+            console.warn(`Arquivo ${file} não contém transações válidas`);
+            continue;
+          }
+          
+          // Filtrar transações com dados válidos
+          const validTransacoes = fileTransacoes.filter(t => 
+            t && t.data && (t.valor !== undefined || t.valor !== null)
+          );
+          
+          transacoes = transacoes.concat(validTransacoes);
+        }
+      } catch (error) {
+        console.error('Erro ao obter transações:', error);
+        return resumo;
+      }
     }
     
     // Se não houver transações, retorna o resumo vazio
     if (!transacoes || transacoes.length === 0) {
-        return resumo;
+      console.warn('Nenhuma transação válida encontrada');
+      return resumo;
     }
     
-    // Calcula o saldo atual (último saldo da lista ordenada por data)
+    console.log(`Processando ${transacoes.length} transações para o resumo financeiro`);
+    
+    // Função auxiliar para formatar valores monetários
+    const formatarMoeda = (valor) => {
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(valor || 0);
+    };
+    
+    // Função auxiliar para determinar a categoria de uma transação
+    function determinarCategoria(transacao) {
+      const descricao = transacao.descricao || '';
+      const modelo = transacao.modelo || '';
+      const valor = transacao.valor || 0;
+      const ehDebito = valor < 0;
+      
+      // Verificar se é um Pix
+      if (/pix/i.test(modelo)) {
+        return /recebido/i.test(modelo) || !ehDebito ? 'Pix Recebido' : 'Pix Enviado';
+      }
+      
+      // Verificar se é uma transferência (não Pix)
+      if (/transfer[eê]ncia/i.test(modelo) || /ted/i.test(modelo) || /doc/i.test(modelo)) {
+        return 'Transferências';
+      }
+      
+      // Mapeamento de verificações de categoria
+      const categoriasMap = [
+        { check: listaExpressoes.uber, name: 'Uber' },
+        { check: listaExpressoes.alimentacao, name: 'Alimentação' },
+        { check: listaExpressoes.apostas, name: 'Apostas' },
+        { check: listaExpressoes.aluguel, name: 'Aluguel' },
+        { check: listaExpressoes.agua, name: 'Energia' }, // Água e Luz agora são "Energia"
+        { check: listaExpressoes.luz, name: 'Energia' },
+        { check: listaExpressoes.dogs, name: 'Dogs' },
+        { check: listaExpressoes.gas, name: 'Gás' },
+        { check: listaExpressoes.investimentos, name: 'Investimentos' },
+        { check: listaExpressoes.transferenciaPessoa, name: 'Transferências' }
+      ];
+      
+      // Verificar cada categoria
+      for (const cat of categoriasMap) {
+        if (cat.check && verificarCategoria(cat.check, descricao)) {
+          return cat.name;
+        }
+      }
+      
+      // Verificar se é uma compra no débito e tentar categorizar
+      if (/compra no débito/i.test(modelo) || /debito/i.test(modelo)) {
+        if (/uber/i.test(descricao) || /99/i.test(descricao) || /taxi/i.test(descricao)) {
+          return 'Uber';
+        } else if (/mercado/i.test(descricao) || /super/i.test(descricao) || 
+                  /aliment/i.test(descricao) || /rest/i.test(descricao) || 
+                  /lanche/i.test(descricao) || /cafe/i.test(descricao)) {
+          return 'Alimentação';
+        }
+      }
+      
+      return 'Outras';
+    }
+    
+    // Ordenar transações por data (mais recente primeiro)
     transacoes.sort((a, b) => {
-        const dataA = convertStringToDate(a.data);
-        const dataB = convertStringToDate(b.data);
-        return dataB - dataA;
+      const dataA = convertStringToDate(a.data);
+      const dataB = convertStringToDate(b.data);
+      
+      if (!dataA || !dataB) return 0;
+      return dataB - dataA;
     });
     
     // Pega o saldo da transação mais recente
     if (transacoes.length > 0) {
-        resumo.saldoAtual.valor = parseFloat(transacoes[0].saldo_transacao);
-        resumo.saldoAtual.valorFormatado = new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        }).format(resumo.saldoAtual.valor);
+      // Verifica qual propriedade de saldo existe
+      const saldoAtual = transacoes[0].saldo_transacao !== undefined ? 
+                         transacoes[0].saldo_transacao : transacoes[0].saldo;
+      
+      resumo.saldoAtual.valor = parseFloat(saldoAtual || 0);
+      resumo.saldoAtual.valorFormatado = formatarMoeda(resumo.saldoAtual.valor);
     }
     
-    // Calcula os gastos por data
-    transacoes.forEach(transacao => {
-        const data = transacao.data;
-        const valor = parseFloat(transacao.valor);
-        
-        // Gastos por data (apenas valores negativos)
-        if (valor < 0) {
-            if (!resumo.gastosPorData[data]) resumo.gastosPorData[data] = 0;
-            resumo.gastosPorData[data] += valor;
-            
-            // Acumula o total de gastos
-            resumo.totalGastos.valor += Math.abs(valor);
-        }
-        
-        // Saldo por dia
-        if (!resumo.saldoPorDia[data]) resumo.saldoPorDia[data] = 0;
-        resumo.saldoPorDia[data] = parseFloat(transacao.saldo_transacao);
-        
-        // Categoriza a transação
-        let categoria = 'Outras';
-        const descricao = transacao.descricao;
-        
-        // Categorias baseadas em expressões regulares
-        if (verificarCategoria(listaExpressoes.transferenciaPessoa, descricao)) {
-            categoria = 'Transferência (Pessoa)';
-        } else if (verificarCategoria(listaExpressoes.uber, descricao)) {
-            categoria = 'Uber';
-        } else if (verificarCategoria(listaExpressoes.alimentacao, descricao)) {
-            categoria = 'Alimentação';
-        } else if (verificarCategoria(listaExpressoes.apostas, descricao)) {
-            categoria = 'Apostas';
-        } else if (verificarCategoria(listaExpressoes.aluguel, descricao)) {
-            categoria = 'Aluguel';
-        } else if (verificarCategoria(listaExpressoes.agua, descricao)) {
-            categoria = 'Água';
-        } else if (verificarCategoria(listaExpressoes.luz, descricao)) {
-            categoria = 'Luz';
-        } else if (verificarCategoria(listaExpressoes.dogs, descricao)) {
-            categoria = 'Dogs';
-        } else if (verificarCategoria(listaExpressoes.gas, descricao)) {
-            categoria = 'Gás';
-        }
-        
-        // Acumula o valor por categoria (valores absolutos)
-        if (!resumo.valorPorCategoria[categoria]) resumo.valorPorCategoria[categoria] = 0;
-        resumo.valorPorCategoria[categoria] += Math.abs(valor);
+    // Inicializa categorias no resumo
+    const categorias = [
+      'Uber', 'Alimentação', 'Apostas', 'Aluguel', 'Energia', 'Dogs', 'Gás',
+      'Pix Recebido', 'Pix Enviado', 'Transferências', 'Investimentos', 'Outras'
+    ];
+    
+    categorias.forEach(categoria => {
+      resumo.valorPorCategoria[categoria] = 0;
     });
     
-    // Formata o total de gastos
-    resumo.totalGastos.valorFormatado = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    }).format(resumo.totalGastos.valor);
-    
-    // Calcula o período do extrato
+    // Calcula os gastos por data e categoriza transações
     let dataInicial = null;
     let dataFinal = null;
     
     transacoes.forEach(transacao => {
-        const dataObj = convertStringToDate(transacao.data);
-        
+      // Verificar se a transação tem dados válidos
+      if (!transacao.data || transacao.valor === undefined) {
+        return; // Pula esta transação
+      }
+      
+      const data = transacao.data;
+      const valor = parseFloat(transacao.valor || 0);
+      const dataObj = convertStringToDate(data);
+      
+      // Atualiza período do extrato
+      if (dataObj) {
         if (!dataInicial || dataObj < dataInicial) {
-            dataInicial = dataObj;
+          dataInicial = dataObj;
         }
-        
         if (!dataFinal || dataObj > dataFinal) {
-            dataFinal = dataObj;
+          dataFinal = dataObj;
         }
+      }
+      
+      // Gastos por data (apenas valores negativos)
+      if (valor < 0) {
+        if (!resumo.gastosPorData[data]) resumo.gastosPorData[data] = 0;
+        resumo.gastosPorData[data] += valor;
+        
+        // Acumula o total de gastos
+        resumo.totalGastos.valor += Math.abs(valor);
+      }
+      
+      // Saldo por dia
+      const saldo = transacao.saldo_transacao !== undefined ? 
+                    transacao.saldo_transacao : transacao.saldo;
+      
+      if (saldo !== undefined) {
+        resumo.saldoPorDia[data] = parseFloat(saldo);
+      }
+      
+      // Categoriza a transação
+      const categoria = determinarCategoria(transacao);
+      
+      // Acumula o valor por categoria (valores absolutos para gastos)
+      if (valor < 0) {
+        resumo.valorPorCategoria[categoria] += Math.abs(valor);
+      } else if (categoria === 'Pix Recebido' || categoria === 'Investimentos') {
+        // Para categorias de receita, usamos o valor positivo
+        resumo.valorPorCategoria[categoria] += valor;
+      }
     });
+    
+    // Formata o total de gastos
+    resumo.totalGastos.valorFormatado = formatarMoeda(resumo.totalGastos.valor);
     
     // Formata as datas para o formato dd/mm/yyyy
     const formatarData = (data) => {
-        if (!data) return null;
-        const dia = String(data.getDate()).padStart(2, '0');
-        const mes = String(data.getMonth() + 1).padStart(2, '0');
-        const ano = data.getFullYear();
-        return `${dia}/${mes}/${ano}`;
+      if (!data) return null;
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      return `${dia}/${mes}/${ano}`;
     };
     
     resumo.periodoExtrato = {
-        dataInicial: formatarData(dataInicial),
-        dataFinal: formatarData(dataFinal)
+      dataInicial: formatarData(dataInicial),
+      dataFinal: formatarData(dataFinal)
     };
     
+    console.log('Resumo financeiro calculado com sucesso');
     return resumo;
-}
-
+  }
 function obterCategorias() {
-    console.log("Entrando na função obterCategorias");
-    return [
-        { id: 1, name: 'Uber' },
-        { id: 2, name: 'Alimentação' },
-        { id: 3, name: 'Apostas' },
-        { id: 4, name: 'Aluguel' },
-        { id: 5, name: 'Água' },
-        { id: 6, name: 'Luz' },
-        { id: 7, name: 'Dogs' },
-        { id: 8, name: 'Gás' },
-        { id: 9, name: 'Outras' },
-        { id: 10, name: 'Transferência (Pessoa)'}
+    console.log("Obtendo categorias disponíveis...");
+    
+    // Categorias fixas que não dependem diretamente de expressões regulares
+    const categoriasPadrao = [
+      { id: 1, name: 'Pix Recebido' },
+      { id: 2, name: 'Pix Enviado' },
+      { id: 3, name: 'Transferências' },
+      { id: 4, name: 'Outras' }
     ];
-}
-
-function obterResumoFinanceiro() {
-    console.log("Entrando na função obterResumoFinanceiro");
+    
     try {
-        // Calcula o resumo financeiro com todas as transações
-        const resumo = calcularResumoFinanceiro();
-        
-        // Adiciona informações adicionais
-        resumo.categorias = obterCategorias();
-        resumo.periodoExtrato = obterPeriodoExtrato();
-        
-        return {
-            success: true,
-            resumo: resumo
-        };
+      // Carregar as expressões regulares
+      let listaExpressoes;
+      try {
+        listaExpressoes = require('./lista_expressoes_regulares');
+        console.log('Expressões regulares carregadas:', Object.keys(listaExpressoes));
+      } catch (error) {
+        console.error('Erro ao carregar expressões regulares:', error);
+        // Se não conseguir carregar as expressões, retorna apenas as categorias padrão
+        return categoriasPadrao;
+      }
+      
+      // Mapeamento entre chaves de expressões regulares e nomes de categorias
+      const mapeamentoExpressoes = [
+        { chave: 'uber', nome: 'Uber' },
+        { chave: 'alimentacao', nome: 'Alimentação' },
+        { chave: 'apostas', nome: 'Apostas' },
+        { chave: 'aluguel', nome: 'Aluguel' },
+        { chave: 'agua', nome: 'Energia' }, // Água e Luz agora são "Energia"
+        { chave: 'luz', nome: 'Energia' },  // Duplicado para manter consistência
+        { chave: 'dogs', nome: 'Dogs' },
+        { chave: 'gas', nome: 'Gás' },
+        { chave: 'investimentos', nome: 'Investimentos' }
+      ];
+      
+      // Conjunto para evitar duplicatas (como Energia que aparece duas vezes)
+      const categoriasSet = new Set();
+      
+      // Adicionar categorias padrão ao conjunto
+      categoriasPadrao.forEach(cat => categoriasSet.add(cat.name));
+      
+      // Adicionar categorias baseadas em expressões regulares
+      mapeamentoExpressoes.forEach(mapa => {
+        if (listaExpressoes[mapa.chave]) {
+          categoriasSet.add(mapa.nome);
+        }
+      });
+      
+      // Converter o conjunto em um array de objetos com id e nome
+      const categorias = Array.from(categoriasSet).map((nome, index) => {
+        return { id: index + 1, name: nome };
+      });
+      
+      console.log(`Retornando ${categorias.length} categorias`);
+      return categorias;
+      
     } catch (error) {
-        console.error('Erro ao obter resumo financeiro:', error);
-        return {
-            success: false,
-            message: 'Erro ao obter resumo financeiro',
-            error: error.message
-        };
+      console.error('Erro ao obter categorias:', error);
+      return categoriasPadrao;
     }
-
-
-
-}
-
-function getTransacoesRecentes(limite) {
+  }
+function obterResumoFinanceiro() {
+    console.log("Obtendo resumo financeiro completo...");
+    
     try {
-        const diretorioExtratos = path.join(__dirname, '../../dao/extrato_inter_json');
+      // Verificar se o diretório de dados existe
+      if (!fs.existsSync(jsonDir)) {
+        console.error(`Diretório de dados não encontrado: ${jsonDir}`);
+        return {
+          success: false,
+          message: 'Diretório de dados não encontrado',
+          error: `O diretório ${jsonDir} não existe`
+        };
+      }
+      
+      // Obter todas as transações uma única vez para evitar múltiplas leituras de arquivos
+      const transacoes = obterTodasTransacoes();
+      
+      if (!transacoes || transacoes.length === 0) {
+        console.warn('Nenhuma transação encontrada para gerar o resumo');
+        return {
+          success: true,
+          resumo: {
+            saldoAtual: { valor: 0, valorFormatado: 'R$ 0,00' },
+            totalGastos: { valor: 0, valorFormatado: 'R$ 0,00' },
+            gastosPorData: {},
+            saldoPorDia: {},
+            valorPorCategoria: {},
+            periodoExtrato: { dataInicial: null, dataFinal: null },
+            categorias: obterCategorias(),
+            transacoesRecentes: []
+          }
+        };
+      }
+      
+      console.log(`Processando ${transacoes.length} transações para o resumo financeiro`);
+      
+      // Calcula o resumo financeiro com as transações obtidas
+      const resumo = calcularResumoFinanceiro(transacoes);
+      
+      // Adiciona informações adicionais
+      resumo.categorias = obterCategorias();
+      
+      // Não precisamos chamar obterPeriodoExtrato() separadamente,
+      // pois calcularResumoFinanceiro() já calcula o período
+      
+      // Adiciona as transações mais recentes ao resumo
+      resumo.transacoesRecentes = obterTransacoesRecentes(transacoes, 5);
+      
+      console.log('Resumo financeiro gerado com sucesso');
+      return {
+        success: true,
+        resumo: resumo
+      };
+      
+    } catch (error) {
+      console.error('Erro ao obter resumo financeiro:', error);
+      return {
+        success: false,
+        message: 'Erro ao obter resumo financeiro',
+        error: error.message
+      };
+    }
+  }
+function obterTransacoesRecentes(transacoes, limite = 5) {
+    console.log(`Obtendo ${limite} transações mais recentes do array...`);
+    
+    if (!transacoes || !Array.isArray(transacoes) || transacoes.length === 0) {
+      console.warn('Array de transações vazio ou inválido');
+      return [];
+    }
+    
+    try {
+      // Clonar o array para não modificar o original
+      const transacoesClone = [...transacoes];
+      
+      // Ordenar as transações por data (mais recente primeiro)
+      transacoesClone.sort((a, b) => {
+        const dataA = convertStringToDate(a.data);
+        const dataB = convertStringToDate(b.data);
         
-        // Verifica se o diretório existe
-        if (!fs.existsSync(diretorioExtratos)) {
-            console.error('Diretório de extratos não encontrado:', diretorioExtratos);
-            return [];
+        // Verificar se as datas são válidas
+        if (!dataA || !dataB) {
+          return 0; // Manter a ordem se alguma data for inválida
         }
         
-        // Lê todos os arquivos do diretório
-        const arquivos = fs.readdirSync(diretorioExtratos)
-            .filter(arquivo => arquivo.endsWith('.json'));
-        
-        // Array para armazenar todas as transações
-        let todasTransacoes = [];
-        
-        // Processa cada arquivo
-        arquivos.forEach(arquivo => {
-            try {
-                const caminhoArquivo = path.join(diretorioExtratos, arquivo);
-                const conteudo = fs.readFileSync(caminhoArquivo, 'utf8');
-                const transacoes = JSON.parse(conteudo);
-                
-                // Verifica se o arquivo tem o formato esperado (array de transações)
-                if (Array.isArray(transacoes)) {
-                    // Adiciona as transações ao array
-                    todasTransacoes = todasTransacoes.concat(
-                        transacoes.map(transacao => ({
-                            ...transacao,
-                            arquivo: arquivo // opcional: adiciona o nome do arquivo de origem
-                        }))
-                    );
-                }
-            } catch (erro) {
-                console.error(`Erro ao processar o arquivo ${arquivo}:`, erro);
-            }
-        });
-        
-        // Converte as datas do formato DD/MM/YYYY para objetos Date para ordenação correta
-        todasTransacoes.forEach(transacao => {
-            if (transacao.data && typeof transacao.data === 'string') {
-                const partes = transacao.data.split('/');
-                if (partes.length === 3) {
-                    // Cria uma data no formato MM/DD/YYYY para o construtor Date
-                    transacao._dataObj = new Date(`${partes[1]}/${partes[0]}/${partes[2]}`);
-                }
-            }
-        });
-        
-        // Ordena as transações por data (mais recente primeiro)
-        todasTransacoes.sort((a, b) => {
-            // Usa os objetos Date criados acima
-            if (a._dataObj && b._dataObj) {
-                return b._dataObj - a._dataObj; // Ordem decrescente (mais recente primeiro)
-            }
-            return 0;
-        });
-        
-        // Remove a propriedade temporária _dataObj antes de retornar
-        todasTransacoes = todasTransacoes.map(transacao => {
-            const { _dataObj, ...resto } = transacao;
-            return resto;
-        });
-        
-        // Retorna as transações mais recentes, limitadas pelo parâmetro
-        return todasTransacoes.slice(0, limite);
-    } catch (erro) {
-        console.error('Erro ao obter transações recentes:', erro);
-        return [];
+        return dataB - dataA;
+      });
+      
+      // Limitar o número de transações
+      const transacoesRecentes = transacoesClone.slice(0, limite);
+      
+      // Formatador de moeda
+      const formatarMoeda = (valor) => {
+        return new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(valor || 0);
+      };
+      
+      // Formatar os valores
+      const transacoesFormatadas = transacoesRecentes.map(transacao => {
+        return {
+          ...transacao,
+          valorFormatado: formatarMoeda(transacao.valor),
+          // Verifica qual propriedade de saldo existe
+          saldoFormatado: formatarMoeda(
+            transacao.saldo_transacao !== undefined ? 
+            transacao.saldo_transacao : transacao.saldo
+          )
+        };
+      });
+      
+      console.log(`Retornando ${transacoesFormatadas.length} transações recentes`);
+      return transacoesFormatadas;
+      
+    } catch (error) {
+      console.error('Erro ao obter transações recentes do array:', error);
+      return [];
     }
-}
+  }
+function obterTodasTransacoes() {
+    console.log('Obtendo todas as transações...');
+    
+    try {
+      // Verificar se o diretório existe
+      if (!fs.existsSync(jsonDir)) {
+        console.error(`Diretório não encontrado: ${jsonDir}`);
+        return [];
+      }
+      
+      const files = fs.readdirSync(jsonDir).filter(file => file.endsWith('.json'));
+      console.log(`Encontrados ${files.length} arquivos JSON para processar`);
+      
+      if (files.length === 0) {
+        console.warn('Nenhum arquivo JSON encontrado');
+        return [];
+      }
+      
+      let todasTransacoes = [];
+      
+      // Processar cada arquivo
+      for (const file of files) {
+        const filePath = path.join(jsonDir, file);
+        
+        let fileData;
+        try {
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          fileData = JSON.parse(fileContent);
+        } catch (error) {
+          console.error(`Erro ao ler/parsear arquivo ${file}:`, error);
+          continue; // Pula para o próximo arquivo
+        }
+        
+        // Verificar estrutura do arquivo - aceita tanto data.extrato quanto um array direto
+        const fileTransacoes = fileData.extrato || (Array.isArray(fileData) ? fileData : null);
+        if (!fileTransacoes || !Array.isArray(fileTransacoes)) {
+          console.warn(`Arquivo ${file} não contém transações válidas`);
+          continue;
+        }
+        
+        // Filtrar transações com dados válidos
+        const validTransacoes = fileTransacoes.filter(t => 
+          t && t.data && (t.valor !== undefined || t.valor !== null)
+        );
+        
+        todasTransacoes = todasTransacoes.concat(validTransacoes);
+      }
+      
+      console.log(`Total de ${todasTransacoes.length} transações obtidas`);
+      return todasTransacoes;
+      
+    } catch (error) {
+      console.error('Erro ao obter todas as transações:', error);
+      return [];
+    }
+  }
 
-module.exports = {
-    getTransacoesRecentes,
-    filtroCategoriaData,
-    saldoAtual,
-    valorGastoPorData,
-    saldoTotalPorDia,
-    valorPorCategoria,
-    obterPeriodoExtrato,
-    obterTransacoesRecentes,
-    calcularResumoFinanceiro,
-    obterCategorias,
-    obterResumoFinanceiro
-}
+  module.exports = {
+    // Funções de obtenção de dados básicos
+    obterTodasTransacoes,                // Obtém todas as transações de todos os arquivos
+    obterTransacoesRecentes,             // Obtém as transações mais recentes (nova versão)
+    obterCategorias,                     // Obtém a lista de categorias disponíveis
+    obterPeriodoExtrato,                 // Obtém o período coberto pelos extratos
+    
+    // Funções de cálculo e análise
+    calcularResumoFinanceiro,            // Calcula o resumo financeiro completo
+    saldoAtual,                          // Obtém o saldo atual da conta
+    valorGastoPorData,                   // Calcula o valor gasto por data
+    saldoTotalPorDia,                    // Calcula o saldo total por dia
+    valorPorCategoria,                   // Calcula o valor por categoria
+    filtroCategoriaData,                 // Filtra transações por categoria e data
+    
+    // Funções de resumo e agregação
+    obterResumoFinanceiro,               // Obtém o resumo financeiro completo com informações adicionais
+    
+    // Funções obsoletas (mantidas para compatibilidade)
+    getTransacoesRecentes: obterTransacoesRecentes  // Alias para compatibilidade com código existente
+  };

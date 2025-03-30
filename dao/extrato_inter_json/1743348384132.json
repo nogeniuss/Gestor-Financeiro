@@ -1,0 +1,779 @@
+[
+  {
+    "data": "31/01/2025",
+    "descricao": "Casa Da Marmita        Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -26.89,
+    "saldo": 50.91
+  },
+  {
+    "data": "31/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -23,
+    "saldo": 77.8
+  },
+  {
+    "data": "31/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 100.8
+  },
+  {
+    "data": "31/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 50,
+    "saldo": 150.8
+  },
+  {
+    "data": "31/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 50,
+    "saldo": 100.8
+  },
+  {
+    "data": "31/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 50.8
+  },
+  {
+    "data": "31/01/2025",
+    "descricao": "Milium Loja 17         Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -49.9,
+    "saldo": 100.8
+  },
+  {
+    "data": "31/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 150.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 200.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "Lf Comercio Eletronicos Ltda",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 250.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 200,
+    "saldo": 300.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 100.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 150.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 200.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 250.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -100,
+    "saldo": 300.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -100,
+    "saldo": 400.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 250,
+    "saldo": 500.7
+  },
+  {
+    "data": "30/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 250.7
+  },
+  {
+    "data": "29/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 200,
+    "saldo": 300.7
+  },
+  {
+    "data": "29/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -100,
+    "saldo": 100.7
+  },
+  {
+    "data": "29/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -100,
+    "saldo": 200.7
+  },
+  {
+    "data": "28/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -200,
+    "saldo": 300.7
+  },
+  {
+    "data": "28/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 100,
+    "saldo": 500.7
+  },
+  {
+    "data": "28/01/2025",
+    "descricao": "Angeloni Super Loja 15 Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.23,
+    "saldo": 400.7
+  },
+  {
+    "data": "28/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -85,
+    "saldo": 415.93
+  },
+  {
+    "data": "28/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -100,
+    "saldo": 500.93
+  },
+  {
+    "data": "28/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -100,
+    "saldo": 600.93
+  },
+  {
+    "data": "27/01/2025",
+    "descricao": "Uber Do Brasil Tecnologia Ltda",
+    "modelo": "Pix enviado",
+    "valor": -15.64,
+    "saldo": 700.93
+  },
+  {
+    "data": "27/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -84,
+    "saldo": 716.57
+  },
+  {
+    "data": "26/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -59,
+    "saldo": 800.57
+  },
+  {
+    "data": "26/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 100,
+    "saldo": 859.57
+  },
+  {
+    "data": "26/01/2025",
+    "descricao": "Itau Unibanco",
+    "modelo": "Pix enviado",
+    "valor": -262.93,
+    "saldo": 759.57
+  },
+  {
+    "data": "26/01/2025",
+    "descricao": "Realize Credito Financiamento E Investim",
+    "modelo": "Pix enviado",
+    "valor": -261.98,
+    "saldo": 1022.5
+  },
+  {
+    "data": "26/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -75,
+    "saldo": 1284.48
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 300,
+    "saldo": 1359.48
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 200,
+    "saldo": 1059.48
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "Aqua Magic Blumenau    Curitiba      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.9,
+    "saldo": 859.48
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "Aqua Magic Blumenau    Curitiba      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.9,
+    "saldo": 875.38
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "Aqua Magic Blumenau    Curitiba      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.9,
+    "saldo": 891.28
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "Aqua Magic Blumenau    Curitiba      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.9,
+    "saldo": 907.18
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "Auto Posto Blu Limitad Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -9,
+    "saldo": 923.08
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -28.73,
+    "saldo": 932.08
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "Panvel Farmacias       Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -29.98,
+    "saldo": 960.81
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "Uber Do Brasil Tecnologia Ltda",
+    "modelo": "Pix enviado",
+    "valor": -10.54,
+    "saldo": 990.79
+  },
+  {
+    "data": "25/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 500,
+    "saldo": 1001.33
+  },
+  {
+    "data": "24/01/2025",
+    "descricao": "Angeloni Super Loja 15 Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -35.35,
+    "saldo": 501.33
+  },
+  {
+    "data": "24/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 100,
+    "saldo": 536.68
+  },
+  {
+    "data": "24/01/2025",
+    "descricao": "Uber Do Brasil Tecnologia Ltda",
+    "modelo": "Pix enviado",
+    "valor": -17.12,
+    "saldo": 436.68
+  },
+  {
+    "data": "24/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 453.8
+  },
+  {
+    "data": "22/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 542,
+    "saldo": 503.8
+  },
+  {
+    "data": "22/01/2025",
+    "descricao": "Angeloni Super Loja 15 Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -38.2,
+    "saldo": -38.2
+  },
+  {
+    "data": "21/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 0
+  },
+  {
+    "data": "20/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 0.36,
+    "saldo": 50
+  },
+  {
+    "data": "20/01/2025",
+    "descricao": "Criptomoedas",
+    "modelo": "Compra",
+    "valor": -1.23,
+    "saldo": 49.64
+  },
+  {
+    "data": "20/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 300,
+    "saldo": 50.87
+  },
+  {
+    "data": "20/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -200,
+    "saldo": -249.13
+  },
+  {
+    "data": "20/01/2025",
+    "descricao": "Pagfacil Meios De Pagamentos Ltda",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": -49.13
+  },
+  {
+    "data": "16/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 0.87
+  },
+  {
+    "data": "15/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 50.87
+  },
+  {
+    "data": "15/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 50,
+    "saldo": 100.87
+  },
+  {
+    "data": "15/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 50.87
+  },
+  {
+    "data": "15/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 100,
+    "saldo": 100.87
+  },
+  {
+    "data": "15/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 0.87
+  },
+  {
+    "data": "15/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 50.87
+  },
+  {
+    "data": "15/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 100.87
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "52767598 Alessandro Correia De Lima",
+    "modelo": "Pix enviado",
+    "valor": -24.4,
+    "saldo": 150.87
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -26,
+    "saldo": 175.27
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 200,
+    "saldo": 201.27
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 1.27
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 51.27
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 101.27
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "Angeloni Super Loja 15 Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -14.24,
+    "saldo": 151.27
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "Angeloni Farmacia 82   Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -9.99,
+    "saldo": 165.51
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 180,
+    "saldo": 175.5
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "Uber Do Brasil Tecnologia Ltda",
+    "modelo": "Pix enviado",
+    "valor": -17.1,
+    "saldo": -4.5
+  },
+  {
+    "data": "14/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -38,
+    "saldo": 12.6
+  },
+  {
+    "data": "13/01/2025",
+    "descricao": "Rex Pad&conf           Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -19.5,
+    "saldo": 50.6
+  },
+  {
+    "data": "13/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -30,
+    "saldo": 70.1
+  },
+  {
+    "data": "12/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 100.1
+  },
+  {
+    "data": "12/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -21.77,
+    "saldo": 150.1
+  },
+  {
+    "data": "12/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -29,
+    "saldo": 171.87
+  },
+  {
+    "data": "11/01/2025",
+    "descricao": "Apostaraiz Ltda",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 200.87
+  },
+  {
+    "data": "11/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 250.87
+  },
+  {
+    "data": "11/01/2025",
+    "descricao": "Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 50,
+    "saldo": 300.87
+  },
+  {
+    "data": "11/01/2025",
+    "descricao": "Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 100,
+    "saldo": 250.87
+  },
+  {
+    "data": "11/01/2025",
+    "descricao": "Angeloni Super Loja 15 Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -154.42,
+    "saldo": 150.87
+  },
+  {
+    "data": "11/01/2025",
+    "descricao": "Angeloni Farmacia 82   Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -9.99,
+    "saldo": 305.29
+  },
+  {
+    "data": "11/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -35,
+    "saldo": 315.28
+  },
+  {
+    "data": "11/01/2025",
+    "descricao": "Ana Lais Da Silva",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 350.28
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Pagfacil Meios De Pagamentos Ltda",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 400.28
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Criptomoedas",
+    "modelo": "Compra",
+    "valor": -2,
+    "saldo": 450.28
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Marllon Antonio Machado Hetzler",
+    "modelo": "Pix recebido",
+    "valor": 8.86,
+    "saldo": 452.28
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Criptomoedas",
+    "modelo": "Compra",
+    "valor": -2,
+    "saldo": 443.42
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Criptomoedas",
+    "modelo": "Compra",
+    "valor": -2,
+    "saldo": 445.42
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Criptomoedas",
+    "modelo": "Compra",
+    "valor": -2,
+    "saldo": 447.42
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 150,
+    "saldo": 449.42
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Aqua Magic Blumenau    Curitiba      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.9,
+    "saldo": 299.42
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Aqua Magic Blumenau    Curitiba      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.9,
+    "saldo": 315.32
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 300,
+    "saldo": 331.22
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Aqua Magic Blumenau    Curitiba      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.9,
+    "saldo": 31.22
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Aqua Magic Blumenau    Curitiba      Bra",
+    "modelo": "Compra no débito",
+    "valor": -15.9,
+    "saldo": 47.12
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Uber Do Brasil Tecnologia Ltda",
+    "modelo": "Pix enviado",
+    "valor": -22.81,
+    "saldo": 63.02
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "Uber Do Brasil Tecnologia Ltda",
+    "modelo": "Pix enviado",
+    "valor": -19.17,
+    "saldo": 85.83
+  },
+  {
+    "data": "10/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -45,
+    "saldo": 105
+  },
+  {
+    "data": "09/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -300,
+    "saldo": 150
+  },
+  {
+    "data": "09/01/2025",
+    "descricao": "58469458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -50,
+    "saldo": 450
+  },
+  {
+    "data": "08/01/2025",
+    "descricao": "Refeicoes M M Ltda Me  Blumenau      Bra",
+    "modelo": "Compra no débito",
+    "valor": -8,
+    "saldo": 500
+  },
+  {
+    "data": "08/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 250,
+    "saldo": 508
+  },
+  {
+    "data": "08/01/2025",
+    "descricao": "Jefferson Da Silva Cavalcante",
+    "modelo": "Pix enviado",
+    "valor": -56,
+    "saldo": 258
+  },
+  {
+    "data": "07/01/2025",
+    "descricao": "58.469.458 Jefferson Da Silva Cavalcante",
+    "modelo": "Pix recebido",
+    "valor": 314,
+    "saldo": 314
+  }
+]

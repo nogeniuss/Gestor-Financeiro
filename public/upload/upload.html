@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Extratos - Gestor Financeiro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Seu CSS personalizado -->
+    <link rel="stylesheet" href="dash.css">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/transacoes">
+                                <i class="bi bi-currency-exchange me-2"></i>Transações
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/metas">
+                                <i class="bi bi-bullseye me-2"></i>Metas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/analise-ia">
+                                <i class="bi bi-graph-up me-2"></i>Análise IA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/upload">
+                                <i class="bi bi-upload me-2"></i>Upload
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/configuracoes">
+                                <i class="bi bi-gear me-2"></i>Configurações
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link text-danger" href="/logout">
+                                <i class="bi bi-box-arrow-right me-2"></i>Sair
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Conteúdo principal -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div id="upload-container" class="container-fluid px-0">
+                    <!-- Loader -->
+                    <div id="loading" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                    </div>
+
+                    <!-- Alertas -->
+                    <div id="upload-alerts"></div>
+
+                    <!-- Conteúdo do Upload -->
+                    <div id="upload-content">
+                        <!-- Cabeçalho -->
+                        <header class="my-4">
+                            <h1 class="text-center">Upload de Extratos</h1>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span>Formatos aceitos: CSV (Extratos bancários)</span>
+                                </div>
+                                <div>
+                                    <button id="btn-refresh-upload" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-clockwise me-1"></i> Atualizar
+                                    </button>
+                                </div>
+                            </div>
+                        </header>
+
+                        <!-- Card de Upload -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <i class="bi bi-cloud-upload me-2"></i>Upload de Arquivo
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="uploadForm" enctype="multipart/form-data">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <div class="form-group mb-3">
+                                                        <label for="file" class="form-label">Selecione um arquivo CSV para converter:</label>
+                                                        <input type="file" id="file" name="file" class="form-control" accept=".csv" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 d-flex align-items-end">
+                                                    <button type="submit" id="submitBtn" class="btn btn-primary w-100">
+                                                        <i class="bi bi-upload me-2"></i>Enviar e Converter
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status de Processamento -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <i class="bi bi-activity me-2"></i>Status de Processamento
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="processing-status">
+                                            <div class="alert alert-info" role="alert">
+                                                <i class="bi bi-info-circle me-2"></i>
+                                                Nenhum arquivo em processamento no momento.
+                                            </div>
+                                        </div>
+                                        <div id="progress-container" style="display: none;">
+                                            <h5>Progresso:</h5>
+                                            <div class="progress mb-3">
+                                                <div id="upload-progress" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                                     role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                            </div>
+                                            <div id="current-file-info" class="text-muted small"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Arquivos Processados Recentemente -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <i class="bi bi-clock-history me-2"></i>Arquivos Processados Recentemente
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Arquivo</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="processed-files-table-body">
+                                            <tr>
+                                                <td colspan="4" class="text-center">Nenhum arquivo processado recentemente</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Seu JavaScript personalizado -->
+    <script src="upload.js"></script>
+</body>
+</html>
