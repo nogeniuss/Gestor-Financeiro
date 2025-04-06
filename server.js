@@ -265,6 +265,10 @@ app.get('/api/recent-uploads', async (req, res) => {
   }
 });
 
+
+
+
+
 app.use((err, req, res, next) => {
   console.error('Erro no servidor:', err);
   res.status(500).json({

@@ -36,56 +36,60 @@ function verificarCategoria(listaExpressoes, descricao) {
   }
 function saldoAtual(dataInicio, dataFim) {
     console.log('Calculando saldo atual...');
-    
-    // Inicializa o saldo inicial como 0
-    let saldoInicial = 0;
-    // Array para armazenar todas as transações
     let todasTransacoes = obterTodasTransacoes();
-  
+    
     try {
-      // Ordena as transações por data (da mais antiga para a mais recente)
-      todasTransacoes.sort((a, b) => {
-        const dataA = new Date(a.data.split('/').reverse().join('-'));
-        const dataB = new Date(b.data.split('/').reverse().join('-'));
-        return dataA - dataB;
-      });
-      
-      // Filtra as transações pelo período especificado
-      if (dataInicio || dataFim) {
-        todasTransacoes = todasTransacoes.filter(transacao => {
-          // Converte a data da transação para objeto Date (formato DD/MM/YYYY para YYYY-MM-DD)
-          const partes = transacao.data.split('/');
-          const dataTransacao = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
-          
-          // Verifica se está dentro do período
-          if (dataInicio && dataFim) {
-            return dataTransacao >= dataInicio && dataTransacao <= dataFim;
-          } else if (dataInicio) {
-            return dataTransacao >= dataInicio;
-          } else if (dataFim) {
-            return dataTransacao <= dataFim;
-          }
-          return true;
+        // Ordena corretamente por data
+        todasTransacoes.sort((a, b) => {
+            const dataA = new Date(a.data.split('/').reverse().join('-'));
+            const dataB = new Date(b.data.split('/').reverse().join('-'));
+            return dataA - dataB;
         });
-      }
-      
-      // Calcula o saldo com base nas transações filtradas
-      let saldoFinal = saldoInicial;
-      todasTransacoes.forEach(transacao => {
-        saldoFinal += transacao.valor || 0;
-      });
-      
-      // Garante que o saldo não seja negativo
-      saldoFinal = Math.max(0, saldoFinal);
-      
-      // Retorna o saldo com 2 casas decimais
-      return parseFloat(saldoFinal.toFixed(2));
-      
+
+        console.log(`Transações após ordenação: ${JSON.stringify(todasTransacoes, null, 2)}`);
+
+        // Filtra as transações pelo período especificado
+        if (dataInicio || dataFim) {
+            todasTransacoes = todasTransacoes.filter(transacao => {
+                const partes = transacao.data.split('/');
+                const dataTransacao = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+
+                if (dataInicio && dataFim) {
+                    return dataTransacao >= dataInicio && dataTransacao <= dataFim;
+                } else if (dataInicio) {
+                    return dataTransacao >= dataInicio;
+                } else if (dataFim) {
+                    return dataTransacao <= dataFim;
+                }
+                return true;
+            });
+        }
+
+        console.log(`Transações filtradas (${dataInicio} a ${dataFim}): ${JSON.stringify(todasTransacoes, null, 2)}`);
+
+        if (todasTransacoes.length === 0) {
+            console.log('Nenhuma transação encontrada no período. Retornando saldo do cabeçalho.');
+            return 0.20; // Ou puxar do cabeçalho do CSV
+        }
+
+        // Opção 1: Pegar saldo da última transação
+        const saldoUltimaTransacao = parseFloat(todasTransacoes[todasTransacoes.length - 1].saldo.toFixed(2));
+        console.log(`Saldo da última transação: ${saldoUltimaTransacao}`);
+
+        // Opção 2: Somar os valores das transações
+        let saldoSomado = 0;
+        todasTransacoes.forEach(transacao => {
+            saldoSomado += transacao.valor;
+        });
+        console.log(`Saldo somado a partir das transações: ${saldoSomado.toFixed(2)}`);
+
+        return saldoUltimaTransacao; // Se preferir, pode testar retornando saldoSomado para comparar
+
     } catch (err) {
-      console.error('Erro ao calcular saldo atual:', err);
-      return 0.00; // Retorna zero em caso de erro
+        console.error('Erro ao calcular saldo atual:', err);
+        return 0.00;
     }
-  }
+  } 
 function valorGastoPorData(dataInicio = null, dataFim = null) {
     console.log('Calculando valor gasto por data...');
     let result = {};
@@ -1117,64 +1121,68 @@ function obterTransacoesRecentes(transacoes, limite = 5) {
       return [];
     }
   }
-function obterTodasTransacoes() {
+  function obterTodasTransacoes() {
     console.log('Obtendo todas as transações...');
     
     try {
-      // Verificar se o diretório existe
-      if (!fs.existsSync(jsonDir)) {
-        console.error(`Diretório não encontrado: ${jsonDir}`);
-        return [];
-      }
-      
-      const files = fs.readdirSync(jsonDir).filter(file => file.endsWith('.json'));
-      console.log(`Encontrados ${files.length} arquivos JSON para processar`);
-      
-      if (files.length === 0) {
-        console.warn('Nenhum arquivo JSON encontrado');
-        return [];
-      }
-      
-      let todasTransacoes = [];
-      
-      // Processar cada arquivo
-      for (const file of files) {
-        const filePath = path.join(jsonDir, file);
-        
-        let fileData;
-        try {
-          const fileContent = fs.readFileSync(filePath, 'utf8');
-          fileData = JSON.parse(fileContent);
-        } catch (error) {
-          console.error(`Erro ao ler/parsear arquivo ${file}:`, error);
-          continue; // Pula para o próximo arquivo
+        if (!fs.existsSync(jsonDir)) {
+            console.error(`Diretório não encontrado: ${jsonDir}`);
+            return [];
         }
         
-        // Verificar estrutura do arquivo - aceita tanto data.extrato quanto um array direto
-        const fileTransacoes = fileData.extrato || (Array.isArray(fileData) ? fileData : null);
-        if (!fileTransacoes || !Array.isArray(fileTransacoes)) {
-          console.warn(`Arquivo ${file} não contém transações válidas`);
-          continue;
+        const files = fs.readdirSync(jsonDir).filter(file => file.endsWith('.json'));
+        console.log(`Encontrados ${files.length} arquivos JSON para processar`);
+        
+        if (files.length === 0) {
+            console.warn('Nenhum arquivo JSON encontrado');
+            return [];
         }
         
-        // Filtrar transações com dados válidos
-        const validTransacoes = fileTransacoes.filter(t => 
-          t && t.data && (t.valor !== undefined || t.valor !== null)
-        );
+        let todasTransacoes = [];
         
-        todasTransacoes = todasTransacoes.concat(validTransacoes);
-      }
-      
-      console.log(`Total de ${todasTransacoes.length} transações obtidas`);
-      return todasTransacoes;
-      
+        for (const file of files) {
+            const filePath = path.join(jsonDir, file);
+            
+            let fileData;
+            try {
+                const fileContent = fs.readFileSync(filePath, 'utf8');
+                fileData = JSON.parse(fileContent);
+            } catch (error) {
+                console.error(`Erro ao ler/parsear arquivo ${file}:`, error);
+                continue;
+            }
+            
+            const fileTransacoes = fileData.extrato || (Array.isArray(fileData) ? fileData : null);
+            if (!fileTransacoes || !Array.isArray(fileTransacoes)) {
+                console.warn(`Arquivo ${file} não contém transações válidas`);
+                continue;
+            }
+            
+            const validTransacoes = fileTransacoes.filter(t => 
+                t && t.data && (t.valor !== undefined || t.valor !== null)
+            );
+
+            todasTransacoes = todasTransacoes.concat(validTransacoes);
+        }
+
+        console.log('Transações carregadas:', JSON.stringify(todasTransacoes, null, 2)); // Exibir todas as transações
+
+        return todasTransacoes;
+        
     } catch (error) {
-      console.error('Erro ao obter todas as transações:', error);
-      return [];
+        console.error('Erro ao obter todas as transações:', error);
+        return [];
     }
   }
 
+
+
+
+
+
+
   module.exports = {
+ 
     // Funções de obtenção de dados básicos
     obterTodasTransacoes,                // Obtém todas as transações de todos os arquivos
     obterTransacoesRecentes,             // Obtém as transações mais recentes (nova versão)

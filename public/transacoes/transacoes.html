@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transações - Gestor Financeiro</title>
+    <title>Análise Financeira - Gestor Financeiro</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -11,7 +11,6 @@
     <!-- CSS personalizado -->
     <link rel="stylesheet" href="transacoes.css">
 </head>
-
 <body>
     <div class="container-fluid">
         <div class="row">
@@ -57,16 +56,17 @@
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div id="transacoes-container" class="container-fluid px-0">
                     <!-- Alertas -->
-                    <div id="transacoes-alerts"></div>
+                    <div id="alerts-container"></div>
 
                     <!-- Cabeçalho -->
                     <header class="my-4">
-                        <h1 class="text-center">Gerenciamento de Transações</h1>
+                        <h1 class="text-center">Análise Financeira</h1>
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                <span id="total-transactions" class="badge bg-primary">Total: 0 transações</span>
-                                <span id="total-income" class="badge bg-success ms-2">Receitas: R$ 0,00</span>
-                                <span id="total-expense" class="badge bg-danger ms-2">Despesas: R$ 0,00</span>
+                                <span id="transaction-count" class="badge bg-primary">Total: 0 transações</span>
+                                <span id="income-value" class="badge bg-success ms-2">Receitas: R$ 0,00</span>
+                                <span id="expense-value" class="badge bg-danger ms-2">Despesas: R$ 0,00</span>
+                                <span id="total-value" class="badge bg-info ms-2">Saldo: R$ 0,00</span>
                             </div>
                             <div>
                                 <button id="btn-add-transaction" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
@@ -79,14 +79,12 @@
                         </div>
                     </header>
 
-                    <!-- Filtros avançados -->
+                    <!-- Filtros simplificados -->
                     <section class="filters-section mb-4">
                         <div class="card">
                             <div class="card-header bg-light">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">
-                                        <i class="bi bi-funnel me-2"></i>Filtros Avançados
-                                    </h5>
+                                    <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros</h5>
                                     <button class="btn btn-sm btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
                                         <i class="bi bi-chevron-down"></i>
                                     </button>
@@ -94,15 +92,22 @@
                             </div>
                             <div class="collapse show" id="filtersCollapse">
                                 <div class="card-body">
-                                    <form id="filters-form">
+                                    <form id="filter-form">
                                         <div class="row g-3">
                                             <div class="col-md-3">
-                                                <label for="filter-date-start" class="form-label">Data Inicial</label>
-                                                <input type="date" class="form-control" id="filter-date-start">
+                                                <label for="start-date" class="form-label">Data Inicial</label>
+                                                <input type="date" class="form-control" id="start-date">
                                             </div>
                                             <div class="col-md-3">
-                                                <label for="filter-date-end" class="form-label">Data Final</label>
-                                                <input type="date" class="form-control" id="filter-date-end">
+                                                <label for="end-date" class="form-label">Data Final</label>
+                                                <input type="date" class="form-control" id="end-date">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="filter-category" class="form-label">Categoria</label>
+                                                <select class="form-select" id="filter-category">
+                                                    <option value="">Todas</option>
+                                                    <!-- Categorias serão carregadas dinamicamente -->
+                                                </select>
                                             </div>
                                             <div class="col-md-3">
                                                 <label for="filter-type" class="form-label">Tipo</label>
@@ -112,43 +117,11 @@
                                                     <option value="expense">Despesas</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-3">
-                                                <label for="filter-category" class="form-label">Categoria</label>
-                                                <select class="form-select" id="filter-category">
-                                                    <option value="">Todas</option>
-                                                    <option value="salario">Salário</option>
-                                                    <option value="alimentacao">Alimentação</option>
-                                                    <option value="transporte">Transporte</option>
-                                                    <option value="lazer">Lazer</option>
-                                                    <option value="saude">Saúde</option>
-                                                    <option value="educacao">Educação</option>
-                                                    <option value="moradia">Moradia</option>
-                                                    <option value="outros">Outros</option>
-                                                </select>
-                                            </div>
                                         </div>
-                                        <div class="row g-3 mt-1">
-                                            <div class="col-md-3">
-                                                <label for="filter-min-value" class="form-label">Valor Mínimo</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">R$</span>
-                                                    <input type="number" class="form-control" id="filter-min-value" min="0" step="0.01">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label for="filter-max-value" class="form-label">Valor Máximo</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">R$</span>
-                                                    <input type="number" class="form-control" id="filter-max-value" min="0" step="0.01">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="filter-description" class="form-label">Descrição</label>
-                                                <input type="text" class="form-control" id="filter-description" placeholder="Buscar na descrição...">
-                                            </div>
-                                            <div class="col-md-2 d-flex align-items-end">
-                                                <button type="submit" class="btn btn-primary w-100">
-                                                    <i class="bi bi-search me-1"></i> Buscar
+                                        <div class="row mt-3">
+                                            <div class="col-12 text-end">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-search me-1"></i> Aplicar Filtros
                                                 </button>
                                             </div>
                                         </div>
@@ -158,139 +131,61 @@
                         </div>
                     </section>
 
-                    <!-- Visualização de transações -->
-                    <section class="transactions-view mb-4">
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="view-options">
-                                        <div class="btn-group" role="group">
-                                            <input type="radio" class="btn-check" name="view-type" id="view-table" autocomplete="off" checked>
-                                            <label class="btn btn-outline-primary" for="view-table">
-                                                <i class="bi bi-table me-1"></i> Tabela
-                                            </label>
-                                            
-                                            <input type="radio" class="btn-check" name="view-type" id="view-cards" autocomplete="off">
-                                            <label class="btn btn-outline-primary" for="view-cards">
-                                                <i class="bi bi-grid-3x3-gap me-1"></i> Cards
-                                            </label>
-                                            
-                                            <input type="radio" class="btn-check" name="view-type" id="view-calendar" autocomplete="off">
-                                            <label class="btn btn-outline-primary" for="view-calendar">
-                                                <i class="bi bi-calendar-week me-1"></i> Calendário
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="sort-options">
-                                        <div class="input-group">
-                                            <label class="input-group-text" for="sort-transactions">Ordenar por</label>
-                                            <select class="form-select" id="sort-transactions">
-                                                <option value="date-desc">Data (mais recente)</option>
-                                                <option value="date-asc">Data (mais antiga)</option>
-                                                <option value="value-desc">Valor (maior)</option>
-                                                <option value="value-asc">Valor (menor)</option>
-                                                <option value="description">Descrição (A-Z)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body p-0">
-                                <!-- Visualização em Tabela -->
-                                <div id="table-view" class="view-container">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover table-striped mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="select-all-transactions">
-                                                            <label class="form-check-label" for="select-all-transactions"></label>
-                                                        </div>
-                                                    </th>
-                                                    <th>Data</th>
-                                                    <th>Descrição</th>
-                                                    <th>Categoria</th>
-                                                    <th>Valor</th>
-                                                    <th>Saldo</th>
-                                                    <th>Status</th>
-                                                    <th>Ações</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="transactions-table-body">
-                                                <!-- Dados serão carregados via API -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <!-- Visualização em Cards -->
-                                <div id="cards-view" class="view-container" style="display: none;">
-                                    <div class="row g-3 p-3" id="transactions-cards-container">
-                                        <!-- Dados serão carregados via API -->
-                                    </div>
-                                </div>
-
-                                <!-- Visualização em Calendário -->
-                                <div id="calendar-view" class="view-container" style="display: none;">
-                                    <div id="transactions-calendar" class="calendar-container">
-                                        <!-- Calendário será renderizado via JavaScript -->
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="bulk-actions">
-                                        <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-categorize-selected" disabled>
-                                                <i class="bi bi-tag me-1"></i> Categorizar
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-success" id="btn-export-selected" disabled>
-                                                <i class="bi bi-download me-1"></i> Exportar
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" id="btn-delete-selected" disabled>
-                                                <i class="bi bi-trash me-1"></i> Excluir
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <nav aria-label="Paginação de transações">
-                                        <ul class="pagination pagination-sm mb-0">
-                                            <li class="page-item disabled">
-                                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
-                                            </li>
-                                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                            <li class="page-item">
-                                                <a class="page-link" href="#">Próxima</a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Estatísticas e Resumos -->
-                    <section class="transaction-stats mb-4">
-                        <div class="row">
+                    <!-- Gráficos principais (2 linhas de 2 colunas) -->
+                    <section class="main-charts mb-4">
+                        <div class="row g-3">
+                            <!-- Gráfico de linha com saldos -->
                             <div class="col-md-6">
                                 <div class="card h-100">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">Resumo por Categoria</h5>
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Evolução do Saldo</h5>
                                     </div>
                                     <div class="card-body">
-                                        <canvas id="categories-chart" height="250"></canvas>
+                                        <div class="chart-container">
+                                            <canvas id="balance-chart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Gráfico de linha com gastos -->
                             <div class="col-md-6">
                                 <div class="card h-100">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">Fluxo de Caixa</h5>
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Evolução dos Gastos</h5>
                                     </div>
                                     <div class="card-body">
-                                        <canvas id="cashflow-chart" height="250"></canvas>
+                                        <div class="chart-container">
+                                            <canvas id="expenses-chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Gráfico de barras (comparando saldo x gastos) -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Comparativo Saldo vs Gastos</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="comparison-chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Gráfico de categorias (donut) -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Distribuição por Categoria</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="categories-chart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -298,48 +193,174 @@
                     </section>
 
                     <!-- Análise de Tendências -->
-                    <section class="transaction-trends mb-4">
+                    <section class="trends-section mb-4">
                         <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Análise de Tendências</h5>
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Análise de Tendências</h5>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary active" id="trends-period-month">Mensal</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="trends-period-quarter">Trimestral</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="trends-period-year">Anual</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <div class="metrics-selector">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="trend-income" value="income" checked>
+                                                <label class="form-check-label" for="trend-income">Receitas</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="trend-expenses" value="expenses" checked>
+                                                <label class="form-check-label" for="trend-expenses">Gastos</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="trend-balance" value="balance" checked>
+                                                <label class="form-check-label" for="trend-balance">Saldo</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="trend-compare" value="compare">
+                                                <label class="form-check-label" for="trend-compare">Comparar com período anterior</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="chart-container">
+                                            <canvas id="trends-chart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="trends-insights">
+                                            <h6 class="text-muted mb-3">Insights</h6>
+                                            <div id="trends-insights">
+                                                <!-- Insights serão adicionados dinamicamente -->
+                                                <div class="text-center py-3">
+                                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                        <span class="visually-hidden">Carregando...</span>
+                                                    </div>
+                                                    <p class="text-muted small mb-0 mt-2">Analisando seus dados...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Mapas de Calor -->
+                    <section class="heatmap-section mb-4">
+                        <div class="row g-3">
+                            <!-- Mapa de calor para gastos -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Mapa de Calor - Gastos</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="expenses-heatmap"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Mapa de calor para saldos -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Mapa de Calor - Saldos</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="balance-heatmap"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Gráfico de Metas -->
+                    <section class="goals-section mb-4">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Comparativo com Metas</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <canvas id="trends-chart" height="250"></canvas>
+                                        <div class="chart-container">
+                                            <canvas id="goals-chart"></canvas>
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="trends-summary">
-                                            <h6 class="text-muted mb-3">Insights</h6>
-                                            <div class="trend-item mb-3">
-                                                <div class="d-flex align-items-center mb-1">
-                                                    <span class="trend-icon bg-success text-white">
-                                                        <i class="bi bi-arrow-down"></i>
-                                                    </span>
-                                                    <h6 class="mb-0 ms-2">Redução de Gastos</h6>
+                                        <div class="goals-summary">
+                                            <h6 class="text-muted mb-3">Progresso das Metas</h6>
+                                            <div id="goals-progress">
+                                                <!-- Progresso das metas será adicionado dinamicamente -->
+                                                <div class="alert alert-info">
+                                                    <i class="bi bi-info-circle me-2"></i>
+                                                    Configure suas metas financeiras para visualizar o progresso.
                                                 </div>
-                                                <p class="text-muted small mb-0">Seus gastos com alimentação diminuíram 15% em relação ao mês anterior.</p>
-                                            </div>
-                                            <div class="trend-item mb-3">
-                                                <div class="d-flex align-items-center mb-1">
-                                                    <span class="trend-icon bg-danger text-white">
-                                                        <i class="bi bi-arrow-up"></i>
-                                                    </span>
-                                                    <h6 class="mb-0 ms-2">Aumento de Despesas</h6>
-                                                </div>
-                                                <p class="text-muted small mb-0">Despesas com transporte aumentaram 8% nos últimos 30 dias.</p>
-                                            </div>
-                                            <div class="trend-item">
-                                                <div class="d-flex align-items-center mb-1">
-                                                    <span class="trend-icon bg-info text-white">
-                                                        <i class="bi bi-info"></i>
-                                                    </span>
-                                                    <h6 class="mb-0 ms-2">Padrão Detectado</h6>
-                                                </div>
-                                                <p class="text-muted small mb-0">Você tende a gastar mais nos finais de semana com lazer.</p>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Tabela de Transações -->
+                    <section class="transactions-table-section mb-4">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Transações Recentes</h5>
+                                    <div class="input-group" style="width: 250px;">
+                                        <label class="input-group-text" for="sort-transactions">Ordenar</label>
+                                        <select class="form-select" id="sort-transactions">
+                                            <option value="date-desc">Data (mais recente)</option>
+                                            <option value="date-asc">Data (mais antiga)</option>
+                                            <option value="value-desc">Valor (maior)</option>
+                                            <option value="value-asc">Valor (menor)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-striped mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Descrição</th>
+                                                <th>Categoria</th>
+                                                <th>Valor</th>
+                                                <th>Saldo</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="transactions-table-body">
+                                            <!-- Dados serão carregados via API -->
+                                            <tr>
+                                                <td colspan="6" class="text-center">Carregando transações...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button class="btn btn-sm btn-outline-primary" id="load-more-transactions">
+                                        <i class="bi bi-arrow-down-circle me-1"></i> Carregar mais
+                                    </button>
+                                    <span class="text-muted small" id="transactions-count-info">Exibindo 0 de 0 transações</span>
                                 </div>
                             </div>
                         </div>
@@ -379,14 +400,7 @@
                             <label for="transaction-category" class="form-label">Categoria</label>
                             <select class="form-select" id="transaction-category" required>
                                 <option value="">Selecione...</option>
-                                <option value="salario">Salário</option>
-                                <option value="alimentacao">Alimentação</option>
-                                <option value="transporte">Transporte</option>
-                                <option value="lazer">Lazer</option>
-                                <option value="saude">Saúde</option>
-                                <option value="educacao">Educação</option>
-                                <option value="moradia">Moradia</option>
-                                <option value="outros">Outros</option>
+                                <!-- Categorias serão carregadas dinamicamente -->
                             </select>
                         </div>
                         <div class="mb-3">
@@ -397,14 +411,6 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="transaction-status" class="form-label">Status</label>
-                            <select class="form-select" id="transaction-status">
-                                <option value="pending">Pendente</option>
-                                <option value="completed">Concluído</option>
-                                <option value="reconciled">Conciliado</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
                             <label for="transaction-notes" class="form-label">Observações</label>
                             <textarea class="form-control" id="transaction-notes" rows="3"></textarea>
                         </div>
@@ -413,27 +419,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="save-transaction">Salvar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para detalhes da transação -->
-    <div class="modal fade" id="transactionDetailsModal" tabindex="-1" aria-labelledby="transactionDetailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="transactionDetailsModalLabel">Detalhes da Transação</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="transaction-details-content">
-                        <!-- Conteúdo será preenchido dinamicamente -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" id="edit-transaction-from-details">Editar</button>
                 </div>
             </div>
         </div>
@@ -464,9 +449,7 @@
                         <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="csv-has-header" checked>
-                                <label class="form-check-label" for="csv-has-header">
-                                    Arquivo contém cabeçalho
-                                </label>
+                                <label class="form-check-label" for="csv-has-header">Arquivo contém cabeçalho</label>
                             </div>
                         </div>
                     </form>
@@ -479,12 +462,57 @@
         </div>
     </div>
 
+    <!-- CSS para os gráficos -->
+    <style>
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        
+        .insight-item {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .insight-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .insight-item.positive {
+            background-color: rgba(75, 192, 192, 0.1);
+            border-left: 3px solid rgba(75, 192, 192, 0.7);
+        }
+        
+        .insight-item.negative {
+            background-color: rgba(255, 99, 132, 0.1);
+            border-left: 3px solid rgba(255, 99, 132, 0.7);
+        }
+        
+        .trends-insights {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+    </style>
+
     <!-- Bootstrap JS Bundle com Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Plugin para Heatmap -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.1.1"></script>
     <!-- Seu JavaScript personalizado -->
-    <script src="transacoes.js"></script>
+    <script src="./transacoes.js"></script>
 </body>
 </html>
-
+                           

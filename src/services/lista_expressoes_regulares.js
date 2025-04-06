@@ -5,7 +5,7 @@ module.exports = {
     /DIDI/i, /TRIP/i, /UBER \*TRIP/i, /AUTO POSTO/i
   ],
   alimentacao: [
-    /REFEIÇÕES/i, /LANCHONETE/i, /ALIMENTAÇÃO/i, /MERCADO/i, /SUPERMERCADO/i, 
+    /Refeicoes/i,/Rex Pad&conf /i,/Angeloni/i,/Casa Do Pao Lanchonete/i,/Pizzaria /i,/Ifood/i,/Atacadao/i,/REFEIÇÕES/i, /LANCHONETE/i, /ALIMENTAÇÃO/i, /MERCADO/i, /SUPERMERCADO/i, 
     /COMIDA/i, /RESTAURANTE/i, /FAST FOOD/i, /SANDUICHE/i, /PIZZA/i, 
     /LIVRARIA/i, /CAFÉ/i, /CAFETERIA/i, /COMPRAS/i, /ANGELONI/i, /COOPER/i, 
     /CASA DE SUCOS/i, /SUSHI/i, /JAPONES/i, /CAFÉ DA MANHÃ/i, /ALMOÇO/i, 
@@ -18,7 +18,7 @@ module.exports = {
     /KIBBE/i, /AQUA MAGIC/i, /PIZZARIA/i, /IFOOD/i, /ATACADAO/i, /TONHO GAS/i
   ],
   apostas: [
-    /APOSTAS/i, /TIGGER/i, /BET/i, /CASINO/i, /ROULETTE/i, /JOGO/i, /BINGO/i, 
+    /Apostaraiz/i,/Conection Pay/i,/Gd  Money/i,/Df Participacoes/i,/Lisboapay/i,/M C R T3 Investimentos/i,/All Bets/i,/Instantpay Ltda/i,/APOSTAS/i, /TIGGER/i, /BET/i, /CASINO/i, /ROULETTE/i, /JOGO/i, /BINGO/i, 
     /CARTA/i, /BET365/i, /BETFAIR/i, /VIRTUAL/i, /LOTERIA/i, /SORTEIO/i, 
     /ROULETTE ONLINE/i, /ROULETTE VIRTUAL/i, /ROULETTE REAL/i, /CASINO ONLINE/i, 
     /POKER/i, /BLACKJACK/i, /TEXAS HOLD'EM/i, /ROULETTE RUSSIA/i, /POKERSTARS/i, 
@@ -32,7 +32,7 @@ module.exports = {
     /ALL BETS/i, /DEMERGE/i, /M C R T3 INVESTIMENTO/i, /BET365/i,/DEMERGE/i
   ],
   aluguel: [
-    /ACRC/i, /IMOBILIÁRIA/i, /ALUGUEL/i, /ALUGA/i, /ALUGUEL RESIDENCIAL/i, 
+    /IMOVEIS BLUMENAU LTDA/i,/ACRC/i, /IMOBILIÁRIA/i, /ALUGUEL/i, /ALUGA/i, /ALUGUEL RESIDENCIAL/i, 
     /ALUGUEL COMERCIAL/i, /ALUGA-SE/i, /ALUGUEL APARTAMENTO/i, /ALUGUEL CASA/i, 
     /CONDOMÍNIO/i, /ALUGUEL LOJA/i, /ALUGUEL MÓVEL/i, /ALUGUEL COMERCIAL/i, 
     /ALUGUEL TRILHA/i, /ALUGUEL APTO/i, /ALUGUEL RESIDENCIAL CASA/i, 
@@ -65,7 +65,7 @@ module.exports = {
     /CONSULTA VET/i, /REMÉDIO PET/i, /BRINQUEDO PET/i, /ACESSÓRIO PET/i
   ],
   gas: [
-    /GÁS/i, /BOTIJÃO/i, /GLP/i, /ULTRAGAZ/i, /LIQUIGÁS/i, /NACIONAL GÁS/i, 
+    /Tonho Gas /i,/GÁS/i, /BOTIJÃO/i, /GLP/i, /ULTRAGAZ/i, /LIQUIGÁS/i, /NACIONAL GÁS/i, 
     /SUPERGASBRAS/i, /FOGÃO/i, /COZINHA/i, /BOTIJÃO DE GÁS/i, /RECARGA GÁS/i,
     /TONHO GAS/i
   ],
@@ -76,7 +76,7 @@ module.exports = {
     /PIX/i, /TRANSFERÊNCIA/i, /TED/i, /DOC/i, /ENVIO/i, /RECEBIDO/i
   ],
   investimentos: [
-    /INVEST/i, /AÇÃO/i, /AÇÕES/i, /BOLSA/i, /TESOURO/i, /FUNDO/i, /CDB/i, 
+    /Criptomoedas/i,/INVEST/i, /AÇÃO/i, /AÇÕES/i, /BOLSA/i, /TESOURO/i, /FUNDO/i, /CDB/i, 
     /LCI/i, /LCA/i, /DEBÊNTURE/i, /RENDA FIXA/i, /RENDA VARIÁVEL/i, /FII/i, 
     /ETF/i, /PREVIDÊNCIA/i, /APLICAÇÃO/i, /RESGATE/i, /DIVIDENDO/i, /JUROS/i, 
     /CORRETORA/i, /BROKER/i, /TRADE/i, /TRADING/i, /STOCK/i, /BOND/i, 
@@ -87,6 +87,6 @@ module.exports = {
     /CONSULTA/i, /EXAME/i, /LABORATORIO/i, /MEDICAMENTO/i, /REMEDIO/i
   ],
   servicos: [
-    /CONVENIO/i, /SPOTIFY/i, /RECARGA/i, /MILIUM/i
+    /Unifique Telecomunicacoes/i,/Ebn         *spotify/i,/Auto Posto Blu Limitad Blumenau/i,/CONVENIO/i, /SPOTIFY/i, /RECARGA/i, /MILIUM/i, /Aqua Magic Blumenau/i, /Cg Lavanderia/i  
   ]
 };
